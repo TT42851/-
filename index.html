@@ -1,0 +1,3594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="皮肤科助手">
+    <title>皮肤科医美工作助手</title>
+    <style>
+        :root {
+            --primary: #2C7A7B;
+            --primary-light: #E6F0F0;
+            --primary-dark: #1A5A5B;
+            --bg: #F5F7F7;
+            --card: #FFFFFF;
+            --text: #1A202C;
+            --text-secondary: #4A5568;
+            --text-muted: #A0AEC0;
+            --border: #E2E8F0;
+            --green: #38A169;
+            --green-bg: #F0FFF4;
+            --orange: #DD6B20;
+            --orange-bg: #FFFAF0;
+            --red: #E53E3E;
+            --red-bg: #FFF5F5;
+            --blue: #3182CE;
+            --blue-bg: #EBF8FF;
+            --purple: #805AD5;
+            --purple-bg: #FAF5FF;
+            --pink: #D53F8C;
+            --pink-bg: #FFF5F7;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --tab-height: 56px;
+            --header-height: 52px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top: env(safe-area-inset-top, 0px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'PingFang SC', 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.5;
+            height: 100%;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        input,
+        textarea,
+        select {
+            user-select: text;
+            -webkit-user-select: text;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(var(--safe-top) + 8px) 16px 8px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            flex-shrink: 0;
+            min-height: calc(var(--header-height) + var(--safe-top));
+        }
+        .app-header .title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .app-header .date-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            transition: background 0.2s;
+        }
+        .icon-btn:active {
+            background: var(--primary-light);
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 12px);
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        .main-content::-webkit-scrollbar {
+            width: 3px;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .tab-bar {
+            display: flex;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            height: calc(var(--tab-height) + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom);
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05);
+        }
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 4px 0;
+        }
+        .tab-item .tab-icon {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .tab-item.active {
+            color: var(--primary);
+        }
+        .tab-item:active {
+            opacity: 0.7;
+        }
+
+        .page {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.2s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: transform 0.15s;
+        }
+        .card:active {
+            transform: scale(0.98);
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:active {
+            background: var(--primary-dark);
+        }
+        .btn-secondary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-danger {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: var(--radius-xs);
+        }
+        .btn-block {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            background: var(--card);
+            color: var(--text);
+            transition: border-color 0.2s;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+        }
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+        .badge-green { background: var(--green-bg); color: var(--green); }
+        .badge-orange { background: var(--orange-bg); color: var(--orange); }
+        .badge-red { background: var(--red-bg); color: var(--red); }
+        .badge-blue { background: var(--blue-bg); color: var(--blue); }
+        .badge-purple { background: var(--purple-bg); color: var(--purple); }
+        .badge-pink { background: var(--pink-bg); color: var(--pink); }
+        .badge-gray { background: #F7FAFC; color: var(--text-secondary); }
+        .badge-primary { background: var(--primary-light); color: var(--primary); }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            background: var(--card);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.15s;
+            gap: 12px;
+        }
+        .list-item:active {
+            background: #F9FAFB;
+            transform: scale(0.98);
+        }
+        .list-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .list-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list-item-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .list-item-arrow {
+            color: var(--text-muted);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .list-item-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-xs);
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--border);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeOverlay 0.2s ease;
+        }
+        @keyframes fadeOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-sheet {
+            background: var(--card);
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px 16px;
+            padding-bottom: calc(20px + var(--safe-bottom));
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px 8px;
+        }
+
+        .h-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+        }
+        .h-scroll::-webkit-scrollbar { display: none; }
+        .h-card {
+            min-width: 240px;
+            max-width: 280px;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 14px;
+            scroll-snap-align: start;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+            transition: transform 0.15s;
+        }
+        .h-card:active { transform: scale(0.97); }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 0;
+            font-size: 14px;
+            background: transparent;
+        }
+        .search-bar .search-icon {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .plan-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .plan-tab {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .plan-tab-green { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+        .plan-tab-green.active { background: var(--green); color: #fff; }
+        .plan-tab-orange { background: var(--orange-bg); color: var(--orange); border-color: var(--orange); }
+        .plan-tab-orange.active { background: var(--orange); color: #fff; }
+        .plan-tab-red { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+        .plan-tab-red.active { background: var(--red); color: #fff; }
+
+        .photo-wall {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .photo-item {
+            width: 72px;
+            height: 72px;
+            border-radius: var(--radius-xs);
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: #F7FAFC;
+        }
+
+        .score-slider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .score-slider input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+        }
+        .score-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: var(--shadow);
+        }
+        .score-display {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .tree-node {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: var(--radius-xs);
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .tree-node:active { background: var(--primary-light); }
+        .tree-node .toggle-icon {
+            width: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        .tree-node .toggle-icon.expanded { transform: rotate(90deg); }
+        .tree-children {
+            margin-left: 20px;
+            border-left: 1.5px solid var(--border);
+            padding-left: 8px;
+        }
+        .tree-children.hidden { display: none; }
+
+        .compare-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: ew-resize;
+            background: #000;
+            max-height: 320px;
+        }
+        .compare-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .compare-container .img-after { clip-path: inset(0 0 0 50%); }
+        .compare-container .divider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: #fff;
+            box-shadow: 0 0 6px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .compare-container .divider-handle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #333;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .compare-label {
+            position: absolute;
+            top: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .compare-label.before { left: 10px; background: rgba(0,0,0,0.7); color: #fff; }
+        .compare-label.after { right: 10px; background: rgba(255,255,255,0.85); color: #333; }
+
+        .fab {
+            position: fixed;
+            right: 20px;
+            bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(44,122,123,0.4);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .fab:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(44,122,123,0.3); }
+
+        .photo-preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 600;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .photo-preview-overlay.show { display: flex; }
+        .photo-preview-overlay img {
+            max-width: 95%;
+            max-height: 80vh;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .photo-preview-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 32px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 601;
+        }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            z-index: 700;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+            max-width: 80%;
+        }
+        .toast.show { opacity: 1; }
+
+        .seg-control {
+            display: flex;
+            background: #EDF2F7;
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            gap: 3px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .seg-item {
+            padding: 7px 14px;
+            border-radius: var(--radius-xs);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .seg-item.active {
+            background: var(--card);
+            color: var(--text);
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+        .text-sm { font-size: 12px; }
+        .mt-8 { margin-top: 8px; }
+        .mt-12 { margin-top: 12px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-8 { margin-bottom: 8px; }
+        .mb-12 { margin-bottom: 12px; }
+        .gap-8 { gap: 8px; }
+        .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .hidden { display: none !important; }
+        .w-full { width: 100%; }
+        .divider { height: 1px; background: var(--border); margin: 12px 0; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 6px; }
+        .timeline-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F0F4F8; }
+        .timeline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .timeline-content { flex: 1; }
+
+        .group-entry-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 16px;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            margin-bottom: 12px;
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+        }
+        .group-entry-card:active { transform: scale(0.97); }
+        .group-entry-card .group-icon {
+            font-size: 36px;
+            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+        .group-entry-card .group-icon.disease-icon { background: var(--blue-bg); }
+        .group-entry-card .group-icon.cosmetic-icon { background: var(--pink-bg); }
+        .group-entry-card .group-content { flex: 1; min-width: 0; }
+        .group-entry-card .group-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+        .group-entry-card .group-subtitle { font-size: 12px; color: var(--text-muted); }
+        .group-entry-card .group-arrow { font-size: 20px; color: var(--text-muted); flex-shrink: 0; }
+        .group-entry-card .group-badge { flex-shrink: 0; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header" id="appHeader">
+            <div>
+                <div class="title" id="headerTitle">首页</div>
+                <div class="date-text" id="headerDate"></div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="globalSearchBtn" title="全局搜索">🔍</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <!-- Page: Home -->
+            <div class="page active" id="page-home">
+                <div class="card" style="margin-bottom:12px;">
+                    <div class="card-title">今日记录</div>
+                    <div id="todayRecordsContainer"></div>
+                </div>
+                <div class="grid-3" style="margin-bottom:12px;">
+                    <button class="btn btn-primary" onclick="navigateToPage('page-disease-add')" style="flex-direction:column;padding:12px 8px;gap:4px;">
+                        <span style="font-size:24px;">📝</span><span style="font-size:11px;">记一条疾病</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="navigateToPage('page-cosmetic-add')" style="flex-direction:column;padding:12px 8px;gap:4px;">
+                        <span style="font-size:24px;">✨</span><span style="font-size:11px;">记医美项目</span>
+                    </button>
+                    <button class="btn btn-outline" onclick="switchTab(2);navigateToPage('page-western-med')" style="flex-direction:column;padding:12px 8px;gap:4px;">
+                        <span style="font-size:24px;">💊</span><span style="font-size:11px;">查西药</span>
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-title">最近记录</div>
+                    <div id="recentRecordsList"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">疗效统计 <span class="badge badge-primary text-sm">本周</span></div>
+                    <div class="flex items-center justify-between">
+                        <div class="text-center" style="flex:1;">
+                            <div style="font-size:28px;font-weight:700;color:var(--primary);" id="statWeekCount">0</div>
+                            <div class="text-sm text-muted">记录数</div>
+                        </div>
+                        <div style="width:1px;height:40px;background:var(--border);"></div>
+                        <div class="text-center" style="flex:1;">
+                            <div style="font-size:28px;font-weight:700;color:var(--primary);" id="statAvgScore">--</div>
+                            <div class="text-sm text-muted">平均疗效分</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Treatment Home (Group selection) -->
+            <div class="page" id="page-treatment-home">
+                <div class="text-sm text-muted mb-12" style="padding:0 4px;">诊疗记录分为两大分组，请选择进入对应模块</div>
+                <div class="group-entry-card" onclick="navigateToPage('page-disease-list');document.getElementById('headerTitle').textContent='皮肤疾病记录';" style="border-color:var(--blue);">
+                    <div class="group-icon disease-icon">🩺</div>
+                    <div class="group-content">
+                        <div class="group-title">皮肤疾病记录</div>
+                        <div class="group-subtitle">日常诊疗 · 用药梯度 · 疗效追踪</div>
+                    </div>
+                    <span class="badge badge-blue group-badge" id="diseaseGroupCount">0条</span>
+                    <span class="group-arrow">›</span>
+                </div>
+                <div class="group-entry-card" onclick="navigateToPage('page-cosmetic-list');document.getElementById('headerTitle').textContent='医疗美容项目';" style="border-color:var(--pink);">
+                    <div class="group-icon cosmetic-icon">✨</div>
+                    <div class="group-content">
+                        <div class="group-title">医疗美容项目</div>
+                        <div class="group-subtitle">注射填充 · 水光针 · 光电 · 植发等</div>
+                    </div>
+                    <span class="badge badge-pink group-badge" id="cosmeticGroupCount">0条</span>
+                    <span class="group-arrow">›</span>
+                </div>
+                <div class="card" style="margin-top:16px;">
+                    <div class="card-title">📌 说明</div>
+                    <div class="text-sm text-muted">「皮肤疾病记录」用于日常皮肤病诊疗记录；「医疗美容项目」用于记录各类医美操作，包括注射填充、水光针、滚针、光电项目、瘢痕治疗、植发等，可记录时间、方案、产品及前后对比照。</div>
+                </div>
+            </div>
+
+            <!-- Page: Disease Records List -->
+            <div class="page" id="page-disease-list">
+                <div class="flex items-center mb-12 gap-8">
+                    <button class="btn btn-outline btn-sm" onclick="navigateToPage('page-treatment-home');document.getElementById('headerTitle').textContent='诊疗记录';">‹ 返回</button>
+                    <span class="text-sm font-weight:600" style="font-weight:600;">皮肤疾病记录</span>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('diseaseSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="diseaseSearchInput" placeholder="搜索疾病名..." oninput="renderDiseaseList()">
+                </div>
+                <div class="seg-control mb-12" id="diseaseFilterSeg">
+                    <button class="seg-item active" data-filter="all" onclick="setDiseaseFilter('all')">全部</button>
+                    <button class="seg-item" data-filter="week" onclick="setDiseaseFilter('week')">本周</button>
+                    <button class="seg-item" data-filter="month" onclick="setDiseaseFilter('month')">本月</button>
+                </div>
+                <div id="diseaseListContainer"></div>
+                <button class="fab" onclick="navigateToPage('page-disease-add')" title="新增记录">+</button>
+            </div>
+
+            <!-- Page: Disease Record Detail -->
+            <div class="page" id="page-disease-detail">
+                <div id="diseaseDetailContent"></div>
+            </div>
+
+            <!-- Page: Disease Record Add/Edit -->
+            <div class="page" id="page-disease-add">
+                <div class="card">
+                    <div class="card-title" id="diseaseFormTitle">新增疾病记录</div>
+                    <form id="diseaseForm" onsubmit="event.preventDefault();saveDiseaseRecord()">
+                        <input type="hidden" id="diseaseFormId">
+                        <div class="form-group">
+                            <label class="form-label">疾病名称 *</label>
+                            <input class="form-input" id="diseaseFormName" required placeholder="如：湿疹">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">发病原理</label>
+                            <textarea class="form-textarea" id="diseaseFormPathology" placeholder="简述发病机制"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">临床常见症状</label>
+                            <textarea class="form-textarea" id="diseaseFormSymptoms" placeholder="如：红斑、丘疹、瘙痒..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">用药梯度</label>
+                            <textarea class="form-textarea" id="diseaseFormGradient" placeholder="从轻到重分步描述用药方案"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">并发症及解决办法</label>
+                            <textarea class="form-textarea" id="diseaseFormComplications" placeholder="描述可能的并发症及应对"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">疗效评分（1-10分）</label>
+                            <div class="score-slider">
+                                <input type="range" id="diseaseFormScore" min="1" max="10" value="7" step="1" oninput="updateScoreDisplay()">
+                                <span class="score-display" id="scoreDisplay">7</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">照片（最多6张）</label>
+                            <div class="photo-wall" id="diseasePhotoPreview"></div>
+                            <div class="flex gap-8 mt-8">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="addDiseasePhoto('camera')">📷 拍照</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="addDiseasePhoto('gallery')">🖼 相册</button>
+                            </div>
+                            <input type="file" id="diseasePhotoInput" accept="image/*" capture="environment" class="hidden" multiple>
+                        </div>
+                        <div class="flex gap-8 mt-16">
+                            <button type="submit" class="btn btn-primary btn-block">保存记录</button>
+                            <button type="button" class="btn btn-outline" onclick="navigateToPage('page-disease-list')">取消</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Page: Cosmetic Projects List -->
+            <div class="page" id="page-cosmetic-list">
+                <div class="flex items-center mb-12 gap-8">
+                    <button class="btn btn-outline btn-sm" onclick="navigateToPage('page-treatment-home');document.getElementById('headerTitle').textContent='诊疗记录';">‹ 返回</button>
+                    <span class="text-sm" style="font-weight:600;">医疗美容项目</span>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('cosmeticSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="cosmeticSearchInput" placeholder="搜索项目名称、方案、产品..." oninput="renderCosmeticList()">
+                </div>
+                <div class="seg-control mb-12" id="cosmeticTypeSeg">
+                    <!-- 动态生成 -->
+                </div>
+                <div id="cosmeticListContainer"></div>
+                <button class="fab" onclick="navigateToPage('page-cosmetic-add')" title="新增医美项目">+</button>
+            </div>
+
+            <!-- Page: Cosmetic Project Detail -->
+            <div class="page" id="page-cosmetic-detail">
+                <div id="cosmeticDetailContent"></div>
+            </div>
+
+            <!-- Page: Cosmetic Project Add/Edit -->
+            <div class="page" id="page-cosmetic-add">
+                <div class="card">
+                    <div class="card-title" id="cosmeticFormTitle">新增医美项目</div>
+                    <form id="cosmeticForm" onsubmit="event.preventDefault();saveCosmeticProject()">
+                        <input type="hidden" id="cosmeticFormId">
+                        <div class="form-group">
+                            <label class="form-label">项目类型 *</label>
+                            <select class="form-select" id="cosmeticFormType">
+                                <option value="注射填充">注射填充</option>
+                                <option value="水光针">水光针</option>
+                                <option value="滚针">滚针</option>
+                                <option value="光电项目">光电项目</option>
+                                <option value="瘢痕">瘢痕</option>
+                                <option value="植发">植发</option>
+                                <option value="其他项目">其他项目</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">项目名称 *</label>
+                            <input class="form-input" id="cosmeticFormName" required placeholder="如：乔雅登填充、水光针治疗...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">日期</label>
+                            <input class="form-input" type="date" id="cosmeticFormDate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">方案</label>
+                            <textarea class="form-textarea" id="cosmeticFormPlan" placeholder="描述治疗方案、操作步骤、使用技术等"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">产品</label>
+                            <textarea class="form-textarea" id="cosmeticFormProduct" placeholder="使用产品、耗材、药品等"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">术前照片</label>
+                            <div class="flex gap-8 items-center">
+                                <img id="cosmeticBeforePreview" class="photo-item" style="width:80px;height:80px;object-fit:cover;display:none;" onclick="showPhotoPreview(this.src)">
+                                <div id="cosmeticBeforePlaceholder" class="text-sm text-muted">未选择照片</div>
+                                <div class="flex gap-4">
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="setCosmeticPhoto('before','camera')">📷 拍照</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="setCosmeticPhoto('before','gallery')">🖼 相册</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">术后照片</label>
+                            <div class="flex gap-8 items-center">
+                                <img id="cosmeticAfterPreview" class="photo-item" style="width:80px;height:80px;object-fit:cover;display:none;" onclick="showPhotoPreview(this.src)">
+                                <div id="cosmeticAfterPlaceholder" class="text-sm text-muted">未选择照片</div>
+                                <div class="flex gap-4">
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="setCosmeticPhoto('after','camera')">📷 拍照</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="setCosmeticPhoto('after','gallery')">🖼 相册</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-textarea" id="cosmeticFormNotes" placeholder="其他备注信息"></textarea>
+                        </div>
+                        <div class="flex gap-8 mt-16">
+                            <button type="submit" class="btn btn-primary btn-block">保存项目</button>
+                            <button type="button" class="btn btn-outline" onclick="navigateToPage('page-cosmetic-list')">取消</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Page: Western Medicine (Mind Map) -->
+            <div class="page" id="page-western-med">
+                <div class="seg-control mb-12" id="westernDimSeg">
+                    <button class="seg-item active" data-dim="成份" onclick="setWesternDim('成份')">按成份</button>
+                    <button class="seg-item" data-dim="厂家" onclick="setWesternDim('厂家')">按厂家</button>
+                    <button class="seg-item" data-dim="适应症" onclick="setWesternDim('适应症')">按适应症</button>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('westernSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="westernSearchInput" placeholder="搜索药品名..." oninput="renderWesternTree()">
+                </div>
+                <div id="westernTreeContainer"></div>
+                <button class="fab" onclick="showWesternAddModal()" title="新增药品">+</button>
+            </div>
+
+            <!-- Page: Compatibility Plans -->
+            <div class="page" id="page-compat">
+                <div class="search-bar mb-12" onclick="document.getElementById('compatSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="compatSearchInput" placeholder="搜索疾病..." oninput="renderCompatList()">
+                </div>
+                <div id="compatListContainer"></div>
+                <button class="fab" onclick="showCompatAddModal()" title="新增配伍方案">+</button>
+            </div>
+
+            <!-- Page: Herbal Medicines -->
+            <div class="page" id="page-herbal">
+                <div class="search-bar mb-12" onclick="document.getElementById('herbalSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="herbalSearchInput" placeholder="搜索药名/功效..." oninput="renderHerbalList()">
+                </div>
+                <div class="seg-control mb-12" style="overflow-x:auto;">
+                    <button class="seg-item active" data-cat="all" onclick="setHerbalCat('all')">全部</button>
+                    <button class="seg-item" data-cat="清热燥湿" onclick="setHerbalCat('清热燥湿')">清热燥湿</button>
+                    <button class="seg-item" data-cat="养血润燥" onclick="setHerbalCat('养血润燥')">养血润燥</button>
+                    <button class="seg-item" data-cat="活血化瘀" onclick="setHerbalCat('活血化瘀')">活血化瘀</button>
+                    <button class="seg-item" data-cat="解毒杀虫" onclick="setHerbalCat('解毒杀虫')">解毒杀虫</button>
+                    <button class="seg-item" data-cat="祛风止痒" onclick="setHerbalCat('祛风止痒')">祛风止痒</button>
+                </div>
+                <div id="herbalListContainer"></div>
+                <button class="fab" onclick="showHerbalAddModal()" title="新增中药">+</button>
+            </div>
+
+            <!-- Page: Patent Medicines -->
+            <div class="page" id="page-patent-med">
+                <div class="search-bar mb-12" onclick="document.getElementById('patentSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="patentSearchInput" placeholder="搜索中成药..." oninput="renderPatentList()">
+                </div>
+                <div id="patentListContainer"></div>
+                <button class="fab" onclick="showPatentAddModal()" title="新增中成药">+</button>
+            </div>
+
+            <!-- Page: Hydra Products -->
+            <div class="page" id="page-hydra">
+                <div class="seg-control mb-12" id="hydraDimSeg">
+                    <button class="seg-item active" data-dim="厂家" onclick="setHydraDim('厂家')">按厂家</button>
+                    <button class="seg-item" data-dim="成份" onclick="setHydraDim('成份')">按成份</button>
+                    <button class="seg-item" data-dim="适应症" onclick="setHydraDim('适应症')">按适应症</button>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('hydraSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="hydraSearchInput" placeholder="搜索产品..." oninput="renderHydraList()">
+                </div>
+                <div id="hydraListContainer"></div>
+                <button class="fab" onclick="showHydraAddModal()" title="新增产品">+</button>
+            </div>
+
+            <!-- Page: Fillers -->
+            <div class="page" id="page-fillers">
+                <div class="seg-control mb-12" id="fillerDimSeg">
+                    <button class="seg-item active" data-dim="厂家" onclick="setFillerDim('厂家')">按厂家</button>
+                    <button class="seg-item" data-dim="适应症" onclick="setFillerDim('适应症')">按适应症</button>
+                    <button class="seg-item" data-dim="成份" onclick="setFillerDim('成份')">按成份</button>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('fillerSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="fillerSearchInput" placeholder="搜索填充剂..." oninput="renderFillerList()">
+                </div>
+                <div class="seg-control mb-12" id="fillerSortSeg">
+                    <button class="seg-item active" data-sort="default" onclick="setFillerSort('default')">默认排序</button>
+                    <button class="seg-item" data-sort="price" onclick="setFillerSort('price')">按价格</button>
+                    <button class="seg-item" data-sort="duration" onclick="setFillerSort('duration')">按维持时间</button>
+                </div>
+                <div id="fillerListContainer"></div>
+                <button class="fab" onclick="showFillerAddModal()" title="新增填充剂">+</button>
+            </div>
+
+            <!-- Page: Threads -->
+            <div class="page" id="page-threads">
+                <div class="seg-control mb-12" id="threadDimSeg">
+                    <button class="seg-item active" data-dim="厂家" onclick="setThreadDim('厂家')">按厂家</button>
+                    <button class="seg-item" data-dim="适应症" onclick="setThreadDim('适应症')">按适应症</button>
+                    <button class="seg-item" data-dim="成份" onclick="setThreadDim('成份')">按成份</button>
+                </div>
+                <div class="seg-control mb-12" id="threadShapeSeg">
+                    <button class="seg-item active" data-shape="全部" onclick="setThreadShape('全部')">全部形态</button>
+                    <button class="seg-item" data-shape="大V线" onclick="setThreadShape('大V线')">大V线</button>
+                    <button class="seg-item" data-shape="小V线" onclick="setThreadShape('小V线')">小V线</button>
+                    <button class="seg-item" data-shape="平滑线" onclick="setThreadShape('平滑线')">平滑线</button>
+                    <button class="seg-item" data-shape="螺旋线" onclick="setThreadShape('螺旋线')">螺旋线</button>
+                    <button class="seg-item" data-shape="铃铛线" onclick="setThreadShape('铃铛线')">铃铛线</button>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('threadSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="threadSearchInput" placeholder="搜索线材..." oninput="renderThreadList()">
+                </div>
+                <div id="threadListContainer"></div>
+                <button class="fab" onclick="showThreadAddModal()" title="新增线材">+</button>
+            </div>
+
+            <!-- Page: Scar Types -->
+            <div class="page" id="page-scar-types">
+                <div id="scarTypeListContainer"></div>
+                <button class="fab" onclick="showScarTypeAddModal()" title="新增瘢痕类型">+</button>
+            </div>
+
+            <!-- Page: Scar Medicines -->
+            <div class="page" id="page-scar-meds">
+                <div class="seg-control mb-12" id="scarMedDimSeg">
+                    <button class="seg-item active" data-dim="厂家" onclick="setScarMedDim('厂家')">按厂家</button>
+                    <button class="seg-item" data-dim="适应症" onclick="setScarMedDim('适应症')">按适应症</button>
+                    <button class="seg-item" data-dim="成份" onclick="setScarMedDim('成份')">按成份</button>
+                </div>
+                <div class="seg-control mb-12" id="scarMedFormSeg">
+                    <button class="seg-item active" data-form="全部" onclick="setScarMedForm('全部')">全部剂型</button>
+                    <button class="seg-item" data-form="外用" onclick="setScarMedForm('外用')">外用</button>
+                    <button class="seg-item" data-form="注射" onclick="setScarMedForm('注射')">注射</button>
+                    <button class="seg-item" data-form="口服" onclick="setScarMedForm('口服')">口服</button>
+                </div>
+                <div class="search-bar mb-12" onclick="document.getElementById('scarMedSearchInput').focus()">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="scarMedSearchInput" placeholder="搜索瘢痕用药..." oninput="renderScarMedList()">
+                </div>
+                <div id="scarMedListContainer"></div>
+                <button class="fab" onclick="showScarMedAddModal()" title="新增用药">+</button>
+            </div>
+
+            <!-- Page: My -->
+            <div class="page" id="page-my">
+                <div class="card" onclick="exportBackup()" style="cursor:pointer;">
+                    <div class="card-title">📦 数据备份与导出</div>
+                    <div class="text-sm text-muted">将全部数据导出到「文件」App</div>
+                </div>
+                <div class="card" onclick="showImportModal()" style="cursor:pointer;">
+                    <div class="card-title">📂 从备份恢复</div>
+                    <div class="text-sm text-muted">从之前导出的备份文件恢复数据</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📊 数据统计概览</div>
+                    <div id="statsOverviewContainer"></div>
+                </div>
+                <div class="card" onclick="showAboutModal()" style="cursor:pointer;">
+                    <div class="card-title">ℹ️ 关于 App</div>
+                    <div class="text-sm text-muted">皮肤科医美工作助手 v1.0</div>
+                </div>
+                <div class="card" onclick="showClearDataModal()" style="cursor:pointer;border:1px solid var(--red);">
+                    <div class="card-title" style="color:var(--red);">🗑 清空数据</div>
+                    <div class="text-sm text-muted">删除所有数据，不可恢复</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="tab-bar" id="tabBar">
+            <button class="tab-item active" data-tab="0" onclick="switchTab(0)">
+                <span class="tab-icon">🏠</span>
+                <span>首页</span>
+            </button>
+            <button class="tab-item" data-tab="1" onclick="switchTab(1)">
+                <span class="tab-icon">📋</span>
+                <span>诊疗记录</span>
+            </button>
+            <button class="tab-item" data-tab="2" onclick="switchTab(2)">
+                <span class="tab-icon">📚</span>
+                <span>皮肤知识库</span>
+            </button>
+            <button class="tab-item" data-tab="3" onclick="switchTab(3)">
+                <span class="tab-icon">💉</span>
+                <span>医美产品</span>
+            </button>
+            <button class="tab-item" data-tab="4" onclick="switchTab(4)">
+                <span class="tab-icon">👤</span>
+                <span>我的</span>
+            </button>
+        </nav>
+
+        <!-- Global Search Modal -->
+        <div class="modal-overlay" id="globalSearchOverlay">
+            <div class="modal-sheet">
+                <div class="modal-header">
+                    <div class="modal-title">全局搜索</div>
+                    <button class="modal-close" onclick="closeGlobalSearch()">✕</button>
+                </div>
+                <div class="search-bar mb-12">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="globalSearchInput" placeholder="搜索疾病、药品、产品、项目..." oninput="performGlobalSearch()">
+                </div>
+                <div id="globalSearchResults"></div>
+            </div>
+        </div>
+
+        <!-- Photo Preview Overlay -->
+        <div class="photo-preview-overlay" id="photoPreviewOverlay" onclick="closePhotoPreview()">
+            <button class="photo-preview-close">✕</button>
+            <img id="photoPreviewImg" src="" alt="照片预览">
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+        // ========== IndexedDB Setup ==========
+        const DB_NAME = 'dermAssistantDB';
+        const DB_VERSION = 1;
+        const STORES = [
+            'diseaseRecords', 'westernMeds', 'compatPlans', 'herbalMeds',
+            'patentMeds', 'hydraProducts', 'fillers', 'threads',
+            'scarTypes', 'scarMeds', 'cosmeticProjects'   // 原 hairCases 改名
+        ];
+
+        let db = null;
+        let currentTab = 0;
+        let currentPage = 'page-home';
+        let diseaseFilter = 'all';
+        let cosmeticType = '注射填充'; // 当前选中的医美项目类型
+        let westernDim = '成份';
+        let hydraDim = '厂家';
+        let fillerDim = '厂家';
+        let fillerSort = 'default';
+        let threadDim = '厂家';
+        let threadShape = '全部';
+        let scarMedDim = '厂家';
+        let scarMedForm = '全部';
+        let herbalCat = 'all';
+        let tempDiseasePhotos = [];
+        let tempCosmeticBeforePhoto = null;
+        let tempCosmeticAfterPhoto = null;
+        let treeExpandedState = {};
+
+        // ========== Database Initialization ==========
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    STORES.forEach(storeName => {
+                        if (!database.objectStoreNames.contains(storeName)) {
+                            database.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+                        }
+                    });
+                };
+            });
+        }
+
+        function dbAdd(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                const request = store.add(data);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function dbPut(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                const request = store.put(data);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function dbGet(storeName, id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const request = store.get(id);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function dbGetAll(storeName) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function dbDelete(storeName, id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function dbClear(storeName) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                const request = store.clear();
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // ========== Navigation ==========
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            document.querySelectorAll('.tab-item').forEach((item, i) => {
+                item.classList.toggle('active', i === tabIndex);
+            });
+            const pageMap = [
+                'page-home',
+                'page-treatment-home',
+                'page-western-med',
+                'page-hydra',
+                'page-my'
+            ];
+            const headerTitles = ['首页', '诊疗记录', '皮肤知识库', '医美产品', '我的'];
+            document.getElementById('headerTitle').textContent = headerTitles[tabIndex];
+            navigateToPage(pageMap[tabIndex]);
+        }
+
+        function navigateToPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+            currentPage = pageId;
+            document.getElementById('mainContent').scrollTop = 0;
+            if (pageId === 'page-disease-detail') document.getElementById('headerTitle').textContent = '记录详情';
+            if (pageId === 'page-disease-add') document.getElementById('headerTitle').textContent = '皮肤疾病记录';
+            if (pageId === 'page-cosmetic-list') document.getElementById('headerTitle').textContent = '医疗美容项目';
+            if (pageId === 'page-cosmetic-detail') document.getElementById('headerTitle').textContent = '项目详情';
+            if (pageId === 'page-cosmetic-add') document.getElementById('headerTitle').textContent = '医美项目';
+            if (pageId === 'page-compat') document.getElementById('headerTitle').textContent = '用药配伍';
+            if (pageId === 'page-herbal') document.getElementById('headerTitle').textContent = '中药分类';
+            if (pageId === 'page-patent-med') document.getElementById('headerTitle').textContent = '中成药';
+            if (pageId === 'page-fillers') document.getElementById('headerTitle').textContent = '填充剂';
+            if (pageId === 'page-threads') document.getElementById('headerTitle').textContent = '线雕线材';
+            if (pageId === 'page-scar-types') document.getElementById('headerTitle').textContent = '瘢痕种类';
+            if (pageId === 'page-scar-meds') document.getElementById('headerTitle').textContent = '瘢痕用药';
+            if (pageId === 'page-my') document.getElementById('headerTitle').textContent = '我的';
+            if (pageId === 'page-treatment-home') document.getElementById('headerTitle').textContent = '诊疗记录';
+            if (pageId === 'page-disease-list') document.getElementById('headerTitle').textContent = '皮肤疾病记录';
+            renderCurrentPage();
+        }
+
+        function renderCurrentPage() {
+            switch (currentPage) {
+                case 'page-home':
+                    renderHome();
+                    break;
+                case 'page-treatment-home':
+                    renderTreatmentHome();
+                    break;
+                case 'page-disease-list':
+                    renderDiseaseList();
+                    break;
+                case 'page-disease-detail':
+                    renderDiseaseDetail();
+                    break;
+                case 'page-cosmetic-list':
+                    renderCosmeticList();
+                    break;
+                case 'page-cosmetic-detail':
+                    renderCosmeticDetail();
+                    break;
+                case 'page-western-med':
+                    renderWesternTree();
+                    break;
+                case 'page-compat':
+                    renderCompatList();
+                    break;
+                case 'page-herbal':
+                    renderHerbalList();
+                    break;
+                case 'page-patent-med':
+                    renderPatentList();
+                    break;
+                case 'page-hydra':
+                    renderHydraList();
+                    break;
+                case 'page-fillers':
+                    renderFillerList();
+                    break;
+                case 'page-threads':
+                    renderThreadList();
+                    break;
+                case 'page-scar-types':
+                    renderScarTypeList();
+                    break;
+                case 'page-scar-meds':
+                    renderScarMedList();
+                    break;
+                case 'page-my':
+                    renderStatsOverview();
+                    break;
+            }
+        }
+
+        // ========== Treatment Home ==========
+        async function renderTreatmentHome() {
+            const diseaseRecords = await dbGetAll('diseaseRecords');
+            const cosmeticProjects = await dbGetAll('cosmeticProjects');
+            document.getElementById('diseaseGroupCount').textContent = diseaseRecords.length + '条';
+            document.getElementById('cosmeticGroupCount').textContent = cosmeticProjects.length + '条';
+        }
+
+        // ========== Home ==========
+        function renderHome() {
+            renderTodayCards();
+            renderRecentRecords();
+            renderStats();
+        }
+
+        async function renderTodayCards() {
+            const container = document.getElementById('todayRecordsContainer');
+            const records = await dbGetAll('diseaseRecords');
+            const today = new Date().toDateString();
+            const todayRecords = records.filter(r => {
+                const created = r.createdAt ? new Date(r.createdAt) : null;
+                return created && created.toDateString() === today;
+            });
+            if (todayRecords.length === 0) {
+                container.innerHTML = `<div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p>今日暂无皮肤疾病记录</p>
+                    <button class="btn btn-primary btn-sm" onclick="navigateToPage('page-disease-add')">记一条</button>
+                </div>`;
+                return;
+            }
+            container.innerHTML = `<div class="h-scroll">
+                ${todayRecords.map(r => `
+                    <div class="h-card" onclick="viewDiseaseRecord(${r.id})">
+                        <div class="flex justify-between items-center mb-8">
+                            <strong style="font-size:14px;">${r.name || '未命名'}</strong>
+                            <span class="badge badge-primary">${r.currentScore || '--'}分</span>
+                        </div>
+                        <div class="text-sm text-muted mb-8" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${r.symptoms || '无症状描述'}</div>
+                        <div class="text-sm" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--text-secondary);">${r.gradient || '无用药方案'}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        async function renderRecentRecords() {
+            const container = document.getElementById('recentRecordsList');
+            const records = await dbGetAll('diseaseRecords');
+            const sorted = records.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            const recent = sorted.slice(0, 5);
+            if (recent.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted text-sm" style="padding:16px;">暂无皮肤疾病记录</div>';
+                return;
+            }
+            container.innerHTML = recent.map(r => `
+                <div class="list-item" onclick="viewDiseaseRecord(${r.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${r.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${r.symptoms || ''} · ${formatDate(r.createdAt)}</div>
+                    </div>
+                    <span class="badge badge-primary">${r.currentScore || '--'}</span>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function renderStats() {
+            const records = await dbGetAll('diseaseRecords');
+            const now = new Date();
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            const weekRecords = records.filter(r => {
+                const d = r.createdAt ? new Date(r.createdAt) : null;
+                return d && d >= weekStart && d <= now;
+            });
+            document.getElementById('statWeekCount').textContent = weekRecords.length;
+            const scores = weekRecords.filter(r => r.currentScore).map(r => r.currentScore);
+            if (scores.length > 0) {
+                const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                document.getElementById('statAvgScore').textContent = avg.toFixed(1);
+            } else {
+                document.getElementById('statAvgScore').textContent = '--';
+            }
+        }
+
+        // ========== Disease Records (unchanged) ==========
+        let currentDiseaseId = null;
+        let currentDiseaseData = null;
+
+        async function renderDiseaseList() {
+            const container = document.getElementById('diseaseListContainer');
+            const searchTerm = (document.getElementById('diseaseSearchInput').value || '').toLowerCase();
+            let records = await dbGetAll('diseaseRecords');
+            if (diseaseFilter === 'week') {
+                const now = new Date();
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                records = records.filter(r => r.createdAt && new Date(r.createdAt) >= weekStart);
+            } else if (diseaseFilter === 'month') {
+                const now = new Date();
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                records = records.filter(r => r.createdAt && new Date(r.createdAt) >= monthStart);
+            }
+            if (searchTerm) {
+                records = records.filter(r => (r.name || '').toLowerCase().includes(searchTerm));
+            }
+            records.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            if (records.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>暂无皮肤疾病记录</p></div>`;
+                return;
+            }
+            container.innerHTML = records.map(r => `
+                <div class="list-item" onclick="viewDiseaseRecord(${r.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${r.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${r.symptoms || ''} · ${formatDate(r.createdAt)}</div>
+                    </div>
+                    <span class="badge badge-primary">${r.currentScore || '--'}分</span>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        function setDiseaseFilter(filter) {
+            diseaseFilter = filter;
+            document.querySelectorAll('#diseaseFilterSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.filter === filter);
+            });
+            renderDiseaseList();
+        }
+
+        async function viewDiseaseRecord(id) {
+            currentDiseaseId = id;
+            await renderDiseaseDetail();
+            navigateToPage('page-disease-detail');
+            document.getElementById('headerTitle').textContent = '皮肤疾病详情';
+        }
+
+        async function renderDiseaseDetail() {
+            const container = document.getElementById('diseaseDetailContent');
+            if (!currentDiseaseId) return;
+            const record = await dbGet('diseaseRecords', currentDiseaseId);
+            if (!record) {
+                container.innerHTML = '<div class="empty-state">记录不存在</div>';
+                return;
+            }
+            currentDiseaseData = record;
+            const scoreHistory = record.scoreHistory || [];
+            const photos = record.photos || [];
+            container.innerHTML = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:18px;font-weight:700;">${record.name || '未命名'}</h2>
+                        <div class="flex gap-8">
+                            <button class="btn btn-outline btn-sm" onclick="editDiseaseRecord(${record.id})">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteDiseaseRecord(${record.id})">删除</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-8 mb-12">
+                        <span class="badge badge-primary">疗效: ${record.currentScore || '--'}分</span>
+                        <span class="text-sm text-muted">创建: ${formatDate(record.createdAt)}</span>
+                        <span class="text-sm text-muted">更新: ${formatDate(record.updatedAt)}</span>
+                    </div>
+                    ${record.pathology ? `<div class="mb-8"><strong class="text-sm">发病原理:</strong><p class="text-sm mt-4">${record.pathology}</p></div>` : ''}
+                    ${record.symptoms ? `<div class="mb-8"><strong class="text-sm">临床症状:</strong><p class="text-sm mt-4">${record.symptoms}</p></div>` : ''}
+                    ${record.gradient ? `<div class="mb-8"><strong class="text-sm">用药梯度:</strong><p class="text-sm mt-4">${record.gradient}</p></div>` : ''}
+                    ${record.complications ? `<div class="mb-8"><strong class="text-sm">并发症:</strong><p class="text-sm mt-4">${record.complications}</p></div>` : ''}
+                </div>
+                ${photos.length > 0 ? `
+                <div class="card">
+                    <div class="card-title">照片</div>
+                    <div class="photo-wall">
+                        ${photos.map((p, i) => `<img src="${p}" class="photo-item" onclick="showPhotoPreview('${p}')" alt="照片${i+1}">`).join('')}
+                    </div>
+                </div>` : ''}
+                <div class="card">
+                    <div class="card-title">疗效评分历史</div>
+                    <div id="scoreHistoryContainer">
+                        ${scoreHistory.length > 0 ? scoreHistory.slice().reverse().map(h => `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>${h.score}分</strong>
+                                    <span class="text-sm text-muted"> · ${formatDate(h.timestamp)} ${formatTime(h.timestamp)}</span>
+                                </div>
+                            </div>
+                        `).join('') : '<div class="text-sm text-muted">暂无评分历史</div>'}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="form-group">
+                        <label class="form-label">更新疗效评分</label>
+                        <div class="score-slider">
+                            <input type="range" id="updateScoreSlider" min="1" max="10" value="${record.currentScore || 7}" step="1" oninput="document.getElementById('updateScoreDisplay').textContent=this.value">
+                            <span class="score-display" id="updateScoreDisplay">${record.currentScore || 7}</span>
+                        </div>
+                        <button class="btn btn-primary btn-sm mt-8" onclick="updateDiseaseScore()">更新评分</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function updateDiseaseScore() {
+            if (!currentDiseaseId) return;
+            const newScore = parseInt(document.getElementById('updateScoreSlider').value);
+            const record = await dbGet('diseaseRecords', currentDiseaseId);
+            if (!record) return;
+            const history = record.scoreHistory || [];
+            history.push({ score: newScore, timestamp: Date.now() });
+            record.currentScore = newScore;
+            record.scoreHistory = history;
+            record.updatedAt = Date.now();
+            await dbPut('diseaseRecords', record);
+            showToast('评分已更新');
+            await renderDiseaseDetail();
+        }
+
+        function editDiseaseRecord(id) {
+            currentDiseaseId = id;
+            const record = currentDiseaseData;
+            if (!record) return;
+            document.getElementById('diseaseFormTitle').textContent = '编辑皮肤疾病记录';
+            document.getElementById('diseaseFormId').value = id;
+            document.getElementById('diseaseFormName').value = record.name || '';
+            document.getElementById('diseaseFormPathology').value = record.pathology || '';
+            document.getElementById('diseaseFormSymptoms').value = record.symptoms || '';
+            document.getElementById('diseaseFormGradient').value = record.gradient || '';
+            document.getElementById('diseaseFormComplications').value = record.complications || '';
+            document.getElementById('diseaseFormScore').value = record.currentScore || 7;
+            updateScoreDisplay();
+            tempDiseasePhotos = [...(record.photos || [])];
+            renderDiseasePhotoPreview();
+            navigateToPage('page-disease-add');
+            document.getElementById('headerTitle').textContent = '编辑皮肤疾病记录';
+        }
+
+        async function deleteDiseaseRecord(id) {
+            if (!confirm('确认删除这条皮肤疾病记录？')) return;
+            await dbDelete('diseaseRecords', id);
+            showToast('已删除');
+            navigateToPage('page-disease-list');
+            renderDiseaseList();
+        }
+
+        function resetDiseaseForm() {
+            document.getElementById('diseaseFormTitle').textContent = '新增皮肤疾病记录';
+            document.getElementById('diseaseFormId').value = '';
+            document.getElementById('diseaseFormName').value = '';
+            document.getElementById('diseaseFormPathology').value = '';
+            document.getElementById('diseaseFormSymptoms').value = '';
+            document.getElementById('diseaseFormGradient').value = '';
+            document.getElementById('diseaseFormComplications').value = '';
+            document.getElementById('diseaseFormScore').value = 7;
+            updateScoreDisplay();
+            tempDiseasePhotos = [];
+            renderDiseasePhotoPreview();
+            document.getElementById('headerTitle').textContent = '新增皮肤疾病记录';
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scoreDisplay').textContent = document.getElementById('diseaseFormScore').value;
+        }
+
+        function renderDiseasePhotoPreview() {
+            const container = document.getElementById('diseasePhotoPreview');
+            if (tempDiseasePhotos.length === 0) {
+                container.innerHTML = '<span class="text-sm text-muted">暂无照片</span>';
+                return;
+            }
+            container.innerHTML = tempDiseasePhotos.map((p, i) => `
+                <img src="${p}" class="photo-item" onclick="showPhotoPreview('${p}')" alt="照片${i+1}">
+            `).join('');
+        }
+
+        function addDiseasePhoto(source) {
+            const input = document.getElementById('diseasePhotoInput');
+            if (source === 'camera') {
+                input.setAttribute('capture', 'environment');
+            } else {
+                input.removeAttribute('capture');
+            }
+            input.value = '';
+            input.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                for (const file of files) {
+                    if (tempDiseasePhotos.length >= 6) {
+                        showToast('最多6张照片');
+                        break;
+                    }
+                    const compressed = await compressImage(file, 800);
+                    tempDiseasePhotos.push(compressed);
+                }
+                renderDiseasePhotoPreview();
+            };
+            input.click();
+        }
+
+        async function saveDiseaseRecord() {
+            const id = document.getElementById('diseaseFormId').value;
+            const name = document.getElementById('diseaseFormName').value.trim();
+            if (!name) {
+                showToast('请输入疾病名称');
+                return;
+            }
+            const data = {
+                name,
+                pathology: document.getElementById('diseaseFormPathology').value.trim(),
+                symptoms: document.getElementById('diseaseFormSymptoms').value.trim(),
+                gradient: document.getElementById('diseaseFormGradient').value.trim(),
+                complications: document.getElementById('diseaseFormComplications').value.trim(),
+                currentScore: parseInt(document.getElementById('diseaseFormScore').value),
+                photos: [...tempDiseasePhotos],
+                createdAt: id ? (currentDiseaseData?.createdAt || Date.now()) : Date.now(),
+                updatedAt: Date.now(),
+                scoreHistory: id ? (currentDiseaseData?.scoreHistory || []) : []
+            };
+            if (id) {
+                data.id = parseInt(id);
+                await dbPut('diseaseRecords', data);
+            } else {
+                const newId = await dbAdd('diseaseRecords', data);
+                data.id = newId;
+            }
+            showToast('已保存');
+            navigateToPage('page-disease-list');
+            renderDiseaseList();
+            resetDiseaseForm();
+        }
+
+        // ========== Cosmetic Projects (New unified module) ==========
+        let currentCosmeticId = null;
+        let currentCosmeticData = null;
+        const COSMETIC_TYPES = ['注射填充', '水光针', '滚针', '光电项目', '瘢痕', '植发', '其他项目'];
+
+        function setCosmeticType(type) {
+            cosmeticType = type;
+            renderCosmeticList();
+        }
+
+        async function renderCosmeticList() {
+            const container = document.getElementById('cosmeticListContainer');
+            const projects = await dbGetAll('cosmeticProjects');
+            const searchTerm = (document.getElementById('cosmeticSearchInput').value || '').toLowerCase();
+
+            // 生成分类Tab
+            const tabContainer = document.getElementById('cosmeticTypeSeg');
+            tabContainer.innerHTML = COSMETIC_TYPES.map(type => `
+                <button class="seg-item ${type === cosmeticType ? 'active' : ''}" data-type="${type}" onclick="setCosmeticType('${type}')">${type}</button>
+            `).join('');
+
+            // 过滤当前类型
+            let filtered = projects.filter(p => p.projectType === cosmeticType);
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    (p.name || '').toLowerCase().includes(searchTerm) ||
+                    (p.plan || '').toLowerCase().includes(searchTerm) ||
+                    (p.product || '').toLowerCase().includes(searchTerm)
+                );
+            }
+            filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><p>暂无${cosmeticType}项目</p></div>`;
+                return;
+            }
+            container.innerHTML = filtered.map(p => `
+                <div class="list-item" onclick="viewCosmeticProject(${p.id})">
+                    ${p.photoBefore ? `<img src="${p.photoBefore}" class="list-item-thumb" alt="术前">` : '<div class="list-item-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);">📷</div>'}
+                    <div class="list-item-content">
+                        <div class="list-item-title">${p.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${p.date || ''} · ${p.product || ''}</div>
+                    </div>
+                    <span class="badge badge-pink">${p.projectType}</span>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewCosmeticProject(id) {
+            currentCosmeticId = id;
+            await renderCosmeticDetail();
+            navigateToPage('page-cosmetic-detail');
+            document.getElementById('headerTitle').textContent = '项目详情';
+        }
+
+        async function renderCosmeticDetail() {
+            const container = document.getElementById('cosmeticDetailContent');
+            if (!currentCosmeticId) return;
+            const project = await dbGet('cosmeticProjects', currentCosmeticId);
+            if (!project) {
+                container.innerHTML = '<div class="empty-state">项目不存在</div>';
+                return;
+            }
+            currentCosmeticData = project;
+            const beforePhoto = project.photoBefore || null;
+            const afterPhoto = project.photoAfter || null;
+            container.innerHTML = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:18px;font-weight:700;">${project.name || '未命名'}</h2>
+                        <div class="flex gap-8">
+                            <button class="btn btn-outline btn-sm" onclick="editCosmeticProject(${project.id})">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCosmeticProject(${project.id})">删除</button>
+                        </div>
+                    </div>
+                    <div class="tag-group mb-12">
+                        <span class="badge badge-pink">${project.projectType || ''}</span>
+                        <span class="badge badge-gray">${project.date || ''}</span>
+                    </div>
+                    ${project.plan ? `<div class="mb-8"><strong class="text-sm">方案:</strong><p class="text-sm mt-4">${project.plan}</p></div>` : ''}
+                    ${project.product ? `<div class="mb-8"><strong class="text-sm">产品:</strong><p class="text-sm mt-4">${project.product}</p></div>` : ''}
+                    ${project.notes ? `<div class="mb-8"><strong class="text-sm">备注:</strong><p class="text-sm mt-4">${project.notes}</p></div>` : ''}
+                </div>
+                ${beforePhoto && afterPhoto ? `
+                <div class="card">
+                    <div class="card-title">前后对比</div>
+                    <div class="compare-container" id="compareContainer">
+                        <img src="${beforePhoto}" alt="术前" class="img-before">
+                        <img src="${afterPhoto}" alt="术后" class="img-after" id="compareAfterImg">
+                        <div class="divider" id="compareDivider"></div>
+                        <div class="divider-handle" id="compareHandle">↔</div>
+                        <span class="compare-label before">术前</span>
+                        <span class="compare-label after">术后</span>
+                    </div>
+                </div>` : ''}
+                <div class="card">
+                    <div class="card-title">照片</div>
+                    <div class="photo-wall">
+                        ${beforePhoto ? `<img src="${beforePhoto}" class="photo-item" onclick="showPhotoPreview('${beforePhoto}')" alt="术前">` : '<span class="text-sm text-muted">无术前照片</span>'}
+                        ${afterPhoto ? `<img src="${afterPhoto}" class="photo-item" onclick="showPhotoPreview('${afterPhoto}')" alt="术后">` : '<span class="text-sm text-muted">无术后照片</span>'}
+                    </div>
+                </div>
+            `;
+            initCompareInteraction();
+        }
+
+        function initCompareInteraction() {
+            const container = document.getElementById('compareContainer');
+            if (!container) return;
+            const afterImg = document.getElementById('compareAfterImg');
+            const divider = document.getElementById('compareDivider');
+            const handle = document.getElementById('compareHandle');
+            let isDragging = false;
+
+            function updateDivider(clientX) {
+                const rect = container.getBoundingClientRect();
+                const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+                const pct = (x / rect.width) * 100;
+                if (afterImg) afterImg.style.clipPath = `inset(0 0 0 ${pct}%)`;
+                if (divider) divider.style.left = `${pct}%`;
+                if (handle) handle.style.left = `${pct}%`;
+            }
+
+            container.addEventListener('mousedown', (e) => { isDragging = true;
+                updateDivider(e.clientX); });
+            container.addEventListener('mousemove', (e) => { if (isDragging) updateDivider(e.clientX); });
+            container.addEventListener('mouseup', () => { isDragging = false; });
+            container.addEventListener('touchstart', (e) => { isDragging = true;
+                updateDivider(e.touches[0].clientX); });
+            container.addEventListener('touchmove', (e) => { if (isDragging) updateDivider(e.touches[0].clientX); });
+            container.addEventListener('touchend', () => { isDragging = false; });
+        }
+
+        async function deleteCosmeticProject(id) {
+            if (!confirm('确认删除这个医美项目？')) return;
+            await dbDelete('cosmeticProjects', id);
+            showToast('已删除');
+            navigateToPage('page-cosmetic-list');
+            renderCosmeticList();
+        }
+
+        function resetCosmeticForm() {
+            document.getElementById('cosmeticFormTitle').textContent = '新增医美项目';
+            document.getElementById('cosmeticFormId').value = '';
+            document.getElementById('cosmeticFormType').value = '注射填充';
+            document.getElementById('cosmeticFormName').value = '';
+            document.getElementById('cosmeticFormDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('cosmeticFormPlan').value = '';
+            document.getElementById('cosmeticFormProduct').value = '';
+            document.getElementById('cosmeticFormNotes').value = '';
+            tempCosmeticBeforePhoto = null;
+            tempCosmeticAfterPhoto = null;
+            updateCosmeticPhotoPreviews();
+            document.getElementById('headerTitle').textContent = '新增医美项目';
+        }
+
+        function updateCosmeticPhotoPreviews() {
+            const beforePreview = document.getElementById('cosmeticBeforePreview');
+            const beforePlaceholder = document.getElementById('cosmeticBeforePlaceholder');
+            const afterPreview = document.getElementById('cosmeticAfterPreview');
+            const afterPlaceholder = document.getElementById('cosmeticAfterPlaceholder');
+            if (tempCosmeticBeforePhoto) {
+                beforePreview.src = tempCosmeticBeforePhoto;
+                beforePreview.style.display = 'block';
+                beforePlaceholder.style.display = 'none';
+            } else {
+                beforePreview.style.display = 'none';
+                beforePlaceholder.style.display = 'block';
+            }
+            if (tempCosmeticAfterPhoto) {
+                afterPreview.src = tempCosmeticAfterPhoto;
+                afterPreview.style.display = 'block';
+                afterPlaceholder.style.display = 'none';
+            } else {
+                afterPreview.style.display = 'none';
+                afterPlaceholder.style.display = 'block';
+            }
+        }
+
+        function setCosmeticPhoto(which, source) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            if (source === 'camera') input.setAttribute('capture', 'environment');
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const compressed = await compressImage(file, 800);
+                    if (which === 'before') {
+                        tempCosmeticBeforePhoto = compressed;
+                    } else {
+                        tempCosmeticAfterPhoto = compressed;
+                    }
+                    updateCosmeticPhotoPreviews();
+                }
+            };
+            input.click();
+        }
+
+        function editCosmeticProject(id) {
+            currentCosmeticId = id;
+            const project = currentCosmeticData;
+            if (!project) return;
+            document.getElementById('cosmeticFormTitle').textContent = '编辑医美项目';
+            document.getElementById('cosmeticFormId').value = id;
+            document.getElementById('cosmeticFormType').value = project.projectType || '注射填充';
+            document.getElementById('cosmeticFormName').value = project.name || '';
+            document.getElementById('cosmeticFormDate').value = project.date || new Date().toISOString().split('T')[0];
+            document.getElementById('cosmeticFormPlan').value = project.plan || '';
+            document.getElementById('cosmeticFormProduct').value = project.product || '';
+            document.getElementById('cosmeticFormNotes').value = project.notes || '';
+            tempCosmeticBeforePhoto = project.photoBefore || null;
+            tempCosmeticAfterPhoto = project.photoAfter || null;
+            updateCosmeticPhotoPreviews();
+            navigateToPage('page-cosmetic-add');
+            document.getElementById('headerTitle').textContent = '编辑医美项目';
+        }
+
+        async function saveCosmeticProject() {
+            const id = document.getElementById('cosmeticFormId').value;
+            const name = document.getElementById('cosmeticFormName').value.trim();
+            if (!name) {
+                showToast('请输入项目名称');
+                return;
+            }
+            const data = {
+                projectType: document.getElementById('cosmeticFormType').value,
+                name: name,
+                date: document.getElementById('cosmeticFormDate').value,
+                plan: document.getElementById('cosmeticFormPlan').value.trim(),
+                product: document.getElementById('cosmeticFormProduct').value.trim(),
+                notes: document.getElementById('cosmeticFormNotes').value.trim(),
+                photoBefore: tempCosmeticBeforePhoto,
+                photoAfter: tempCosmeticAfterPhoto,
+                createdAt: id ? (currentCosmeticData?.createdAt || Date.now()) : Date.now(),
+                updatedAt: Date.now()
+            };
+            if (id) {
+                data.id = parseInt(id);
+                await dbPut('cosmeticProjects', data);
+            } else {
+                const newId = await dbAdd('cosmeticProjects', data);
+                data.id = newId;
+            }
+            showToast('已保存');
+            navigateToPage('page-cosmetic-list');
+            renderCosmeticList();
+            resetCosmeticForm();
+        }
+
+        // ========== Western Medicine (unchanged) ==========
+        function setWesternDim(dim) {
+            westernDim = dim;
+            document.querySelectorAll('#westernDimSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.dim === dim);
+            });
+            renderWesternTree();
+        }
+
+        async function renderWesternTree() {
+            const container = document.getElementById('westernTreeContainer');
+            const meds = await dbGetAll('westernMeds');
+            const searchTerm = (document.getElementById('westernSearchInput').value || '').toLowerCase();
+            let filtered = meds;
+            if (searchTerm) {
+                filtered = meds.filter(m => (m.genericName || '').toLowerCase().includes(searchTerm) || (m
+                    .ingredient || '').toLowerCase().includes(searchTerm));
+            }
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">💊</div><p>暂无药品数据</p></div>';
+                return;
+            }
+            const groups = {};
+            filtered.forEach(m => {
+                const key = m[westernDim] || '未分类';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(m);
+            });
+            const sortedKeys = Object.keys(groups).sort();
+            container.innerHTML = sortedKeys.map(key => {
+                const items = groups[key];
+                const expKey = `${westernDim}-${key}`;
+                const isExpanded = treeExpandedState[expKey] !== false;
+                return `
+                    <div class="mb-8">
+                        <div class="tree-node" onclick="toggleTree('${expKey}')">
+                            <span class="toggle-icon ${isExpanded?'expanded':''}">▶</span>
+                            <strong>${key}</strong>
+                            <span class="badge badge-gray" style="margin-left:auto;">${items.length}</span>
+                        </div>
+                        <div class="tree-children ${isExpanded?'':'hidden'}" id="tree-${expKey}">
+                            ${items.map(m => `
+                                <div class="tree-node" onclick="viewWesternMed(${m.id})" style="padding-left:12px;">
+                                    <span style="color:var(--text-muted);">·</span>
+                                    <span>${m.genericName || m.name || '未命名'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleTree(key) {
+            treeExpandedState[key] = treeExpandedState[key] === false;
+            const el = document.getElementById(`tree-${key}`);
+            if (el) el.classList.toggle('hidden');
+            const icon = document.querySelector(`[onclick="toggleTree('${key}')"] .toggle-icon`);
+            if (icon) icon.classList.toggle('expanded');
+        }
+
+        async function viewWesternMed(id) {
+            const med = await dbGet('westernMeds', id);
+            if (!med) return;
+            const detailHtml = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:16px;font-weight:700;">${med.genericName || med.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deleteWesternMed(${med.id})">删除</button>
+                    </div>
+                    <div class="tag-group mb-12">
+                        ${med.ingredient ? `<span class="badge badge-blue">成份: ${med.ingredient}</span>` : ''}
+                        ${med.manufacturer ? `<span class="badge badge-green">厂家: ${med.manufacturer}</span>` : ''}
+                        ${med.indication ? `<span class="badge badge-orange">适应症: ${med.indication}</span>` : ''}
+                    </div>
+                    ${med.usage ? `<div class="mb-8"><strong class="text-sm">用法用量:</strong><span class="text-sm"> ${med.usage}</span></div>` : ''}
+                    ${med.notes ? `<div class="mb-8"><strong class="text-sm">备注:</strong><span class="text-sm"> ${med.notes}</span></div>` : ''}
+                </div>
+            `;
+            showModalWithContent('药品详情', detailHtml);
+        }
+
+        function showWesternAddModal() {
+            const html = `
+                <div class="form-group">
+                    <label class="form-label">通用名 *</label>
+                    <input class="form-input" id="wmGenericName" placeholder="如：他克莫司">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">成份</label>
+                    <input class="form-input" id="wmIngredient" placeholder="如：他克莫司">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">厂家</label>
+                    <input class="form-input" id="wmManufacturer" placeholder="如：日本安斯泰来">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">适应症</label>
+                    <input class="form-input" id="wmIndication" placeholder="如：特应性皮炎">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">用法用量</label>
+                    <input class="form-input" id="wmUsage" placeholder="如：每日2次外用">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <input class="form-input" id="wmNotes" placeholder="">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="saveWesternMed()">保存</button>
+            `;
+            showModalWithContent('新增西药', html);
+        }
+
+        async function saveWesternMed() {
+            const data = {
+                genericName: document.getElementById('wmGenericName').value.trim(),
+                ingredient: document.getElementById('wmIngredient').value.trim(),
+                manufacturer: document.getElementById('wmManufacturer').value.trim(),
+                indication: document.getElementById('wmIndication').value.trim(),
+                usage: document.getElementById('wmUsage').value.trim(),
+                notes: document.getElementById('wmNotes').value.trim(),
+                createdAt: Date.now()
+            };
+            if (!data.genericName) { showToast('请输入通用名'); return; }
+            await dbAdd('westernMeds', data);
+            closeModal();
+            renderWesternTree();
+            showToast('已添加');
+        }
+
+        async function deleteWesternMed(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('westernMeds', id);
+            closeModal();
+            renderWesternTree();
+            showToast('已删除');
+        }
+
+        // ========== Compatibility Plans (unchanged) ==========
+        async function renderCompatList() {
+            const container = document.getElementById('compatListContainer');
+            const plans = await dbGetAll('compatPlans');
+            const searchTerm = (document.getElementById('compatSearchInput').value || '').toLowerCase();
+            let filtered = plans;
+            if (searchTerm) {
+                filtered = plans.filter(p => (p.diseaseName || '').toLowerCase().includes(searchTerm));
+            }
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>暂无配伍方案</p></div>';
+                return;
+            }
+            container.innerHTML = filtered.map(p => `
+                <div class="list-item" onclick="viewCompatPlan(${p.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${p.diseaseName || '未命名'}</div>
+                        <div class="list-item-subtitle">3组方案 · ${formatDate(p.createdAt)}</div>
+                    </div>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewCompatPlan(id) {
+            const plan = await dbGet('compatPlans', id);
+            if (!plan) return;
+            const levels = [
+                { key: 'level1', label: '轻中度首选', color: 'green' },
+                { key: 'level2', label: '中重度强化', color: 'orange' },
+                { key: 'level3', label: '难治性联合', color: 'red' }
+            ];
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${plan.diseaseName || '未命名'}</h2>
+                        <div class="flex gap-8">
+                            <button class="btn btn-outline btn-sm" onclick="editCompatPlan(${plan.id})">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCompatPlan(${plan.id})">删除</button>
+                        </div>
+                    </div>
+                </div>
+                ${levels.map(l => `
+                    <div class="card" style="border-left:3px solid var(--${l.color});">
+                        <div class="flex justify-between items-center mb-8">
+                            <span class="badge badge-${l.color}">${l.label}</span>
+                            <button class="btn btn-outline btn-sm" onclick="citeCompatPlan(${plan.id},'${l.key}')">引用到疾病记录</button>
+                        </div>
+                        <div class="text-sm"><strong>药物列表:</strong> ${plan[l.key]?.drugs || '未设置'}</div>
+                        <div class="text-sm mt-4"><strong>用法:</strong> ${plan[l.key]?.usage || '未设置'}</div>
+                        <div class="text-sm mt-4"><strong>适用说明:</strong> ${plan[l.key]?.note || '未设置'}</div>
+                    </div>
+                `).join('')}
+            `;
+            showModalWithContent('配伍方案', html);
+        }
+
+        function citeCompatPlan(planId, levelKey) {
+            closeModal();
+            dbGet('compatPlans', planId).then(plan => {
+                if (!plan) return;
+                const level = plan[levelKey];
+                const gradientText = `【${levelKey === 'level1' ? '轻中度首选' : levelKey === 'level2' ? '中重度强化' : '难治性联合'}】药物: ${level?.drugs || ''} 用法: ${level?.usage || ''} 适用: ${level?.note || ''}`;
+                navigateToPage('page-disease-add');
+                document.getElementById('diseaseFormTitle').textContent = '新增皮肤疾病记录（已引用配伍）';
+                document.getElementById('diseaseFormName').value = plan.diseaseName || '';
+                document.getElementById('diseaseFormGradient').value = gradientText;
+                document.getElementById('headerTitle').textContent = '皮肤疾病记录';
+                showToast('已引用配伍方案');
+            });
+        }
+
+        function showCompatAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">疾病名称 *</label><input class="form-input" id="cpName" placeholder="如：湿疹"></div>
+                <div class="form-group"><label class="form-label">第一组·轻中度首选·药物列表</label><input class="form-input" id="cp1Drugs" placeholder="如：氢化可的松软膏"></div>
+                <div class="form-group"><label class="form-label">第一组·用法</label><input class="form-input" id="cp1Usage" placeholder="如：每日2次外用"></div>
+                <div class="form-group"><label class="form-label">第一组·适用说明</label><input class="form-input" id="cp1Note" placeholder=""></div>
+                <div class="divider"></div>
+                <div class="form-group"><label class="form-label">第二组·中重度强化·药物列表</label><input class="form-input" id="cp2Drugs" placeholder=""></div>
+                <div class="form-group"><label class="form-label">第二组·用法</label><input class="form-input" id="cp2Usage" placeholder=""></div>
+                <div class="form-group"><label class="form-label">第二组·适用说明</label><input class="form-input" id="cp2Note" placeholder=""></div>
+                <div class="divider"></div>
+                <div class="form-group"><label class="form-label">第三组·难治性联合·药物列表</label><input class="form-input" id="cp3Drugs" placeholder=""></div>
+                <div class="form-group"><label class="form-label">第三组·用法</label><input class="form-input" id="cp3Usage" placeholder=""></div>
+                <div class="form-group"><label class="form-label">第三组·适用说明</label><input class="form-input" id="cp3Note" placeholder=""></div>
+                <button class="btn btn-primary btn-block" onclick="saveCompatPlan()">保存</button>
+            `;
+            showModalWithContent('新增配伍方案', html);
+        }
+
+        async function saveCompatPlan() {
+            const name = document.getElementById('cpName').value.trim();
+            if (!name) { showToast('请输入疾病名称'); return; }
+            const data = {
+                diseaseName: name,
+                level1: { drugs: document.getElementById('cp1Drugs').value.trim(), usage: document.getElementById(
+                        'cp1Usage').value.trim(), note: document.getElementById('cp1Note').value.trim() },
+                level2: { drugs: document.getElementById('cp2Drugs').value.trim(), usage: document.getElementById(
+                        'cp2Usage').value.trim(), note: document.getElementById('cp2Note').value.trim() },
+                level3: { drugs: document.getElementById('cp3Drugs').value.trim(), usage: document.getElementById(
+                        'cp3Usage').value.trim(), note: document.getElementById('cp3Note').value.trim() },
+                createdAt: Date.now()
+            };
+            await dbAdd('compatPlans', data);
+            closeModal();
+            renderCompatList();
+            showToast('已保存');
+        }
+
+        async function deleteCompatPlan(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('compatPlans', id);
+            closeModal();
+            renderCompatList();
+            showToast('已删除');
+        }
+
+        async function editCompatPlan(id) {
+            const plan = await dbGet('compatPlans', id);
+            if (!plan) return;
+            const html = `
+                <div class="form-group"><label class="form-label">疾病名称 *</label><input class="form-input" id="cpName" value="${plan.diseaseName || ''}"></div>
+                <div class="form-group"><label class="form-label">轻中度首选·药物</label><input class="form-input" id="cp1Drugs" value="${plan.level1?.drugs || ''}"></div>
+                <div class="form-group"><label class="form-label">轻中度首选·用法</label><input class="form-input" id="cp1Usage" value="${plan.level1?.usage || ''}"></div>
+                <div class="form-group"><label class="form-label">轻中度首选·说明</label><input class="form-input" id="cp1Note" value="${plan.level1?.note || ''}"></div>
+                <div class="form-group"><label class="form-label">中重度强化·药物</label><input class="form-input" id="cp2Drugs" value="${plan.level2?.drugs || ''}"></div>
+                <div class="form-group"><label class="form-label">中重度强化·用法</label><input class="form-input" id="cp2Usage" value="${plan.level2?.usage || ''}"></div>
+                <div class="form-group"><label class="form-label">中重度强化·说明</label><input class="form-input" id="cp2Note" value="${plan.level2?.note || ''}"></div>
+                <div class="form-group"><label class="form-label">难治性联合·药物</label><input class="form-input" id="cp3Drugs" value="${plan.level3?.drugs || ''}"></div>
+                <div class="form-group"><label class="form-label">难治性联合·用法</label><input class="form-input" id="cp3Usage" value="${plan.level3?.usage || ''}"></div>
+                <div class="form-group"><label class="form-label">难治性联合·说明</label><input class="form-input" id="cp3Note" value="${plan.level3?.note || ''}"></div>
+                <button class="btn btn-primary btn-block" onclick="updateCompatPlan(${id})">更新</button>
+            `;
+            showModalWithContent('编辑配伍方案', html);
+        }
+
+        async function updateCompatPlan(id) {
+            const data = {
+                id,
+                diseaseName: document.getElementById('cpName').value.trim(),
+                level1: { drugs: document.getElementById('cp1Drugs').value.trim(), usage: document.getElementById(
+                        'cp1Usage').value.trim(), note: document.getElementById('cp1Note').value.trim() },
+                level2: { drugs: document.getElementById('cp2Drugs').value.trim(), usage: document.getElementById(
+                        'cp2Usage').value.trim(), note: document.getElementById('cp2Note').value.trim() },
+                level3: { drugs: document.getElementById('cp3Drugs').value.trim(), usage: document.getElementById(
+                        'cp3Usage').value.trim(), note: document.getElementById('cp3Note').value.trim() },
+                createdAt: (await dbGet('compatPlans', id))?.createdAt || Date.now(),
+                updatedAt: Date.now()
+            };
+            await dbPut('compatPlans', data);
+            closeModal();
+            renderCompatList();
+            showToast('已更新');
+        }
+
+        // ========== Herbal Medicines (unchanged) ==========
+        function setHerbalCat(cat) {
+            herbalCat = cat;
+            document.querySelectorAll('#page-herbal .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.cat === cat);
+            });
+            renderHerbalList();
+        }
+
+        async function renderHerbalList() {
+            const container = document.getElementById('herbalListContainer');
+            const herbs = await dbGetAll('herbalMeds');
+            const searchTerm = (document.getElementById('herbalSearchInput').value || '').toLowerCase();
+            let filtered = herbs;
+            if (herbalCat !== 'all') {
+                filtered = filtered.filter(h => (h.category || '').includes(herbalCat));
+            }
+            if (searchTerm) {
+                filtered = filtered.filter(h => (h.name || '').toLowerCase().includes(searchTerm) || (h.efficacy || '')
+                    .toLowerCase().includes(searchTerm));
+            }
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🌿</div><p>暂无中药数据</p></div>';
+                return;
+            }
+            container.innerHTML = filtered.map(h => `
+                <div class="list-item" onclick="viewHerbal(${h.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${h.name || '未命名'} ${h.favorite ? '⭐' : ''}</div>
+                        <div class="list-item-subtitle">${h.category || ''} · ${h.efficacy || ''}</div>
+                    </div>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewHerbal(id) {
+            const herb = await dbGet('herbalMeds', id);
+            if (!herb) return;
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${herb.name || '未命名'}</h2>
+                        <div class="flex gap-8">
+                            <button class="btn btn-outline btn-sm" onclick="toggleHerbalFavorite(${herb.id})">${herb.favorite ? '取消收藏' : '收藏'}</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteHerbal(${herb.id})">删除</button>
+                        </div>
+                    </div>
+                    ${herb.category ? `<div class="mb-8"><span class="badge badge-primary">${herb.category}</span></div>` : ''}
+                    ${herb.nature ? `<div class="text-sm mb-8"><strong>性味归经:</strong> ${herb.nature}</div>` : ''}
+                    ${herb.efficacy ? `<div class="text-sm mb-8"><strong>功效:</strong> ${herb.efficacy}</div>` : ''}
+                    ${herb.indication ? `<div class="text-sm mb-8"><strong>适应证:</strong> ${herb.indication}</div>` : ''}
+                    ${herb.usage ? `<div class="text-sm mb-8"><strong>用法用量:</strong> ${herb.usage}</div>` : ''}
+                    ${herb.caution ? `<div class="text-sm mb-8"><strong>使用注意:</strong> ${herb.caution}</div>` : ''}
+                </div>
+            `;
+            showModalWithContent('中药详情', html);
+        }
+
+        async function toggleHerbalFavorite(id) {
+            const herb = await dbGet('herbalMeds', id);
+            if (!herb) return;
+            herb.favorite = !herb.favorite;
+            await dbPut('herbalMeds', herb);
+            closeModal();
+            renderHerbalList();
+            showToast(herb.favorite ? '已收藏' : '已取消收藏');
+        }
+
+        async function deleteHerbal(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('herbalMeds', id);
+            closeModal();
+            renderHerbalList();
+            showToast('已删除');
+        }
+
+        function showHerbalAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">药名 *</label><input class="form-input" id="hmName" placeholder="如：黄柏"></div>
+                <div class="form-group"><label class="form-label">适应证分类</label><select class="form-select" id="hmCategory"><option>清热燥湿</option><option>养血润燥</option><option>活血化瘀</option><option>解毒杀虫</option><option>祛风止痒</option><option>其他</option></select></div>
+                <div class="form-group"><label class="form-label">性味归经</label><input class="form-input" id="hmNature" placeholder="如：苦、寒，归肾经"></div>
+                <div class="form-group"><label class="form-label">功效</label><input class="form-input" id="hmEfficacy" placeholder="如：清热燥湿"></div>
+                <div class="form-group"><label class="form-label">适应证</label><input class="form-input" id="hmIndication" placeholder=""></div>
+                <div class="form-group"><label class="form-label">用法用量</label><input class="form-input" id="hmUsage" placeholder=""></div>
+                <div class="form-group"><label class="form-label">使用注意</label><input class="form-input" id="hmCaution" placeholder=""></div>
+                <button class="btn btn-primary btn-block" onclick="saveHerbal()">保存</button>
+            `;
+            showModalWithContent('新增中药', html);
+        }
+
+        async function saveHerbal() {
+            const name = document.getElementById('hmName').value.trim();
+            if (!name) { showToast('请输入药名'); return; }
+            const data = {
+                name,
+                category: document.getElementById('hmCategory').value,
+                nature: document.getElementById('hmNature').value.trim(),
+                efficacy: document.getElementById('hmEfficacy').value.trim(),
+                indication: document.getElementById('hmIndication').value.trim(),
+                usage: document.getElementById('hmUsage').value.trim(),
+                caution: document.getElementById('hmCaution').value.trim(),
+                favorite: false,
+                createdAt: Date.now()
+            };
+            await dbAdd('herbalMeds', data);
+            closeModal();
+            renderHerbalList();
+            showToast('已添加');
+        }
+
+        // ========== Patent Medicines (unchanged) ==========
+        async function renderPatentList() {
+            const container = document.getElementById('patentListContainer');
+            const meds = await dbGetAll('patentMeds');
+            const searchTerm = (document.getElementById('patentSearchInput').value || '').toLowerCase();
+            let filtered = meds;
+            if (searchTerm) {
+                filtered = meds.filter(m => (m.name || '').toLowerCase().includes(searchTerm));
+            }
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">💊</div><p>暂无中成药数据</p></div>';
+                return;
+            }
+            container.innerHTML = filtered.map(m => `
+                <div class="list-item" onclick="viewPatentMed(${m.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${m.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${m.indication || ''} · ${m.category || ''}</div>
+                    </div>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewPatentMed(id) {
+            const med = await dbGet('patentMeds', id);
+            if (!med) return;
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${med.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deletePatentMed(${med.id})">删除</button>
+                    </div>
+                    ${med.category ? `<div class="mb-8"><span class="badge badge-primary">${med.category}</span></div>` : ''}
+                    ${med.composition ? `<div class="text-sm mb-8"><strong>药物组成:</strong> ${med.composition}</div>` : ''}
+                    ${med.efficacy ? `<div class="text-sm mb-8"><strong>功效主治:</strong> ${med.efficacy}</div>` : ''}
+                    ${med.indication ? `<div class="text-sm mb-8"><strong>适应证:</strong> ${med.indication}</div>` : ''}
+                    ${med.usage ? `<div class="text-sm mb-8"><strong>用法用量:</strong> ${med.usage}</div>` : ''}
+                    ${med.caution ? `<div class="text-sm mb-8"><strong>注意事项:</strong> ${med.caution}</div>` : ''}
+                </div>
+            `;
+            showModalWithContent('中成药详情', html);
+        }
+
+        function showPatentAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">名称 *</label><input class="form-input" id="pmName" placeholder="如：消风散"></div>
+                <div class="form-group"><label class="form-label">疾病/适应证分类</label><input class="form-input" id="pmCategory" placeholder="如：湿疹"></div>
+                <div class="form-group"><label class="form-label">药物组成</label><input class="form-input" id="pmComposition" placeholder="如：荆芥、防风、牛蒡子..."></div>
+                <div class="form-group"><label class="form-label">功效主治</label><input class="form-input" id="pmEfficacy" placeholder=""></div>
+                <div class="form-group"><label class="form-label">适应证</label><input class="form-input" id="pmIndication" placeholder=""></div>
+                <div class="form-group"><label class="form-label">用法用量</label><input class="form-input" id="pmUsage" placeholder=""></div>
+                <div class="form-group"><label class="form-label">注意事项</label><input class="form-input" id="pmCaution" placeholder=""></div>
+                <button class="btn btn-primary btn-block" onclick="savePatentMed()">保存</button>
+            `;
+            showModalWithContent('新增中成药', html);
+        }
+
+        async function savePatentMed() {
+            const name = document.getElementById('pmName').value.trim();
+            if (!name) { showToast('请输入名称'); return; }
+            const data = {
+                name,
+                category: document.getElementById('pmCategory').value.trim(),
+                composition: document.getElementById('pmComposition').value.trim(),
+                efficacy: document.getElementById('pmEfficacy').value.trim(),
+                indication: document.getElementById('pmIndication').value.trim(),
+                usage: document.getElementById('pmUsage').value.trim(),
+                caution: document.getElementById('pmCaution').value.trim(),
+                createdAt: Date.now()
+            };
+            await dbAdd('patentMeds', data);
+            closeModal();
+            renderPatentList();
+            showToast('已添加');
+        }
+
+        async function deletePatentMed(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('patentMeds', id);
+            closeModal();
+            renderPatentList();
+            showToast('已删除');
+        }
+
+        // ========== Hydra Products (unchanged) ==========
+        function setHydraDim(dim) {
+            hydraDim = dim;
+            document.querySelectorAll('#hydraDimSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.dim === dim);
+            });
+            renderHydraList();
+        }
+
+        async function renderHydraList() {
+            const container = document.getElementById('hydraListContainer');
+            const products = await dbGetAll('hydraProducts');
+            const searchTerm = (document.getElementById('hydraSearchInput').value || '').toLowerCase();
+            let filtered = products;
+            if (searchTerm) {
+                filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchTerm) || (p.ingredient || '')
+                    .toLowerCase().includes(searchTerm));
+            }
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">💉</div><p>暂无水光针产品</p></div>';
+                return;
+            }
+            const groups = {};
+            filtered.forEach(p => {
+                const key = p[hydraDim] || '未分类';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(p);
+            });
+            container.innerHTML = Object.keys(groups).sort().map(key => `
+                <div class="card mb-8" style="padding:12px;">
+                    <div class="flex justify-between items-center mb-8">
+                        <strong style="font-size:14px;">${key}</strong>
+                        <span class="badge badge-gray">${groups[key].length}</span>
+                    </div>
+                    ${groups[key].map(p => `
+                        <div class="list-item" onclick="viewHydraProduct(${p.id})" style="margin-bottom:4px;">
+                            <div class="list-item-content">
+                                <div class="list-item-title">${p.name || '未命名'}</div>
+                                <div class="list-item-subtitle">${p.ingredient || ''} · ${p.indication || ''}</div>
+                            </div>
+                            <span class="list-item-arrow">›</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        async function viewHydraProduct(id) {
+            const p = await dbGet('hydraProducts', id);
+            if (!p) return;
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${p.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deleteHydraProduct(${p.id})">删除</button>
+                    </div>
+                    <div class="tag-group mb-12">
+                        ${p.manufacturer ? `<span class="badge badge-blue">厂家: ${p.manufacturer}</span>` : ''}
+                        ${p.ingredient ? `<span class="badge badge-green">成份: ${p.ingredient}</span>` : ''}
+                        ${p.indication ? `<span class="badge badge-orange">适应症: ${p.indication}</span>` : ''}
+                    </div>
+                    ${p.compatPlan ? `<div class="text-sm mb-8"><strong>适应症配伍方案:</strong> ${p.compatPlan}</div>` : ''}
+                </div>
+            `;
+            showModalWithContent('水光针产品', html);
+        }
+
+        function showHydraAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">产品名称 *</label><input class="form-input" id="hpName" placeholder="如：菲洛嘉青春动能素"></div>
+                <div class="form-group"><label class="form-label">厂家</label><input class="form-input" id="hpManufacturer" placeholder="如：法国菲洛嘉"></div>
+                <div class="form-group"><label class="form-label">主要成份</label><input class="form-input" id="hpIngredient" placeholder="如：透明质酸+53种活性成分"></div>
+                <div class="form-group"><label class="form-label">适应症</label><input class="form-input" id="hpIndication" placeholder="如：抗衰、补水"></div>
+                <div class="form-group"><label class="form-label">适应症配伍方案</label><textarea class="form-textarea" id="hpCompatPlan" placeholder="如：基础水光+动能素+肉毒"></textarea></div>
+                <button class="btn btn-primary btn-block" onclick="saveHydraProduct()">保存</button>
+            `;
+            showModalWithContent('新增水光针产品', html);
+        }
+
+        async function saveHydraProduct() {
+            const name = document.getElementById('hpName').value.trim();
+            if (!name) { showToast('请输入产品名称'); return; }
+            const data = {
+                name,
+                manufacturer: document.getElementById('hpManufacturer').value.trim(),
+                ingredient: document.getElementById('hpIngredient').value.trim(),
+                indication: document.getElementById('hpIndication').value.trim(),
+                compatPlan: document.getElementById('hpCompatPlan').value.trim(),
+                createdAt: Date.now()
+            };
+            await dbAdd('hydraProducts', data);
+            closeModal();
+            renderHydraList();
+            showToast('已添加');
+        }
+
+        async function deleteHydraProduct(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('hydraProducts', id);
+            closeModal();
+            renderHydraList();
+            showToast('已删除');
+        }
+
+        // ========== Fillers (unchanged) ==========
+        function setFillerDim(dim) {
+            fillerDim = dim;
+            document.querySelectorAll('#fillerDimSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.dim === dim);
+            });
+            renderFillerList();
+        }
+
+        function setFillerSort(sort) {
+            fillerSort = sort;
+            document.querySelectorAll('#fillerSortSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.sort === sort);
+            });
+            renderFillerList();
+        }
+
+        async function renderFillerList() {
+            const container = document.getElementById('fillerListContainer');
+            let fillers = await dbGetAll('fillers');
+            const searchTerm = (document.getElementById('fillerSearchInput').value || '').toLowerCase();
+            if (searchTerm) {
+                fillers = fillers.filter(f => (f.name || '').toLowerCase().includes(searchTerm) || (f.ingredient || '')
+                    .toLowerCase().includes(searchTerm));
+            }
+            if (fillerSort === 'price') {
+                fillers.sort((a, b) => (a.price || 0) - (b.price || 0));
+            } else if (fillerSort === 'duration') {
+                fillers.sort((a, b) => parseFloat(b.duration) - parseFloat(a.duration));
+            }
+            if (fillers.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">💉</div><p>暂无填充剂数据</p></div>';
+                return;
+            }
+            container.innerHTML = fillers.map(f => `
+                <div class="list-item" onclick="viewFiller(${f.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${f.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${f.manufacturer || ''} · ${f.indication || ''} · ${f.ingredient || ''}</div>
+                    </div>
+                    <div class="text-center" style="min-width:60px;">
+                        <span class="badge badge-orange">${f.duration || '--'}月</span>
+                        <div class="text-sm" style="font-weight:600;color:var(--primary);">¥${f.price || '--'}</div>
+                    </div>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewFiller(id) {
+            const f = await dbGet('fillers', id);
+            if (!f) return;
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${f.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFiller(${f.id})">删除</button>
+                    </div>
+                    <div class="tag-group mb-12">
+                        ${f.manufacturer ? `<span class="badge badge-blue">厂家: ${f.manufacturer}</span>` : ''}
+                        ${f.indication ? `<span class="badge badge-green">适应症: ${f.indication}</span>` : ''}
+                        ${f.ingredient ? `<span class="badge badge-orange">成份: ${f.ingredient}</span>` : ''}
+                    </div>
+                    <div class="grid-2 mb-12">
+                        <div><strong class="text-sm">维持时间:</strong> <span class="badge badge-orange">${f.duration || '--'}月</span></div>
+                        <div><strong class="text-sm">参考价格:</strong> <span style="font-weight:600;color:var(--primary);">¥${f.price || '--'}</span></div>
+                    </div>
+                    ${f.position ? `<div class="text-sm mb-8"><strong>适用部位:</strong> ${f.position}</div>` : ''}
+                    ${f.notes ? `<div class="text-sm mb-8"><strong>备注:</strong> ${f.notes}</div>` : ''}
+                </div>
+            `;
+            showModalWithContent('填充剂详情', html);
+        }
+
+        function showFillerAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">产品名称 *</label><input class="form-input" id="flName" placeholder="如：乔雅登"></div>
+                <div class="form-group"><label class="form-label">厂家</label><input class="form-input" id="flManufacturer" placeholder="如：艾尔建"></div>
+                <div class="form-group"><label class="form-label">成份</label><input class="form-input" id="flIngredient" placeholder="如：交联透明质酸"></div>
+                <div class="form-group"><label class="form-label">适应症</label><input class="form-input" id="flIndication" placeholder="如：面部填充"></div>
+                <div class="form-group"><label class="form-label">适用部位</label><input class="form-input" id="flPosition" placeholder="如：面颊、嘴唇"></div>
+                <div class="form-group"><label class="form-label">维持时间（月）</label><input class="form-input" type="number" id="flDuration" placeholder="如：12"></div>
+                <div class="form-group"><label class="form-label">参考价格（元）</label><input class="form-input" type="number" id="flPrice" placeholder="如：3500"></div>
+                <div class="form-group"><label class="form-label">备注</label><input class="form-input" id="flNotes" placeholder="如：交联度高"></div>
+                <button class="btn btn-primary btn-block" onclick="saveFiller()">保存</button>
+            `;
+            showModalWithContent('新增填充剂', html);
+        }
+
+        async function saveFiller() {
+            const name = document.getElementById('flName').value.trim();
+            if (!name) { showToast('请输入产品名称'); return; }
+            const data = {
+                name,
+                manufacturer: document.getElementById('flManufacturer').value.trim(),
+                ingredient: document.getElementById('flIngredient').value.trim(),
+                indication: document.getElementById('flIndication').value.trim(),
+                position: document.getElementById('flPosition').value.trim(),
+                duration: document.getElementById('flDuration').value.trim(),
+                price: parseFloat(document.getElementById('flPrice').value) || 0,
+                notes: document.getElementById('flNotes').value.trim(),
+                createdAt: Date.now()
+            };
+            await dbAdd('fillers', data);
+            closeModal();
+            renderFillerList();
+            showToast('已添加');
+        }
+
+        async function deleteFiller(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('fillers', id);
+            closeModal();
+            renderFillerList();
+            showToast('已删除');
+        }
+
+        // ========== Threads (unchanged) ==========
+        function setThreadDim(dim) {
+            threadDim = dim;
+            document.querySelectorAll('#threadDimSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.dim === dim);
+            });
+            renderThreadList();
+        }
+
+        function setThreadShape(shape) {
+            threadShape = shape;
+            document.querySelectorAll('#threadShapeSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.shape === shape);
+            });
+            renderThreadList();
+        }
+
+        async function renderThreadList() {
+            const container = document.getElementById('threadListContainer');
+            let threads = await dbGetAll('threads');
+            const searchTerm = (document.getElementById('threadSearchInput').value || '').toLowerCase();
+            if (threadShape !== '全部') {
+                threads = threads.filter(t => (t.shape || '').includes(threadShape));
+            }
+            if (searchTerm) {
+                threads = threads.filter(t => (t.name || '').toLowerCase().includes(searchTerm));
+            }
+            if (threads.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🧵</div><p>暂无线材数据</p></div>';
+                return;
+            }
+            container.innerHTML = threads.map(t => `
+                <div class="list-item" onclick="viewThread(${t.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${t.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${t.shape || ''} · ${t.manufacturer || ''} · ${t.indication || ''}</div>
+                    </div>
+                    <div class="text-center" style="min-width:60px;">
+                        <span class="badge badge-purple">${t.duration || '--'}月</span>
+                        <div class="text-sm" style="font-weight:600;color:var(--primary);">¥${t.price || '--'}</div>
+                    </div>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewThread(id) {
+            const t = await dbGet('threads', id);
+            if (!t) return;
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${t.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deleteThread(${t.id})">删除</button>
+                    </div>
+                    <div class="tag-group mb-12">
+                        ${t.manufacturer ? `<span class="badge badge-blue">厂家: ${t.manufacturer}</span>` : ''}
+                        ${t.shape ? `<span class="badge badge-purple">形态: ${t.shape}</span>` : ''}
+                        ${t.ingredient ? `<span class="badge badge-green">成份: ${t.ingredient}</span>` : ''}
+                        ${t.indication ? `<span class="badge badge-orange">适应症: ${t.indication}</span>` : ''}
+                    </div>
+                    <div class="grid-2 mb-12">
+                        <div><strong class="text-sm">维持时间:</strong> <span class="badge badge-purple">${t.duration || '--'}月</span></div>
+                        <div><strong class="text-sm">参考价格:</strong> <span style="font-weight:600;color:var(--primary);">¥${t.price || '--'}</span></div>
+                    </div>
+                    ${t.position ? `<div class="text-sm mb-8"><strong>适用部位:</strong> ${t.position}</div>` : ''}
+                    ${t.notes ? `<div class="text-sm mb-8"><strong>备注:</strong> ${t.notes}</div>` : ''}
+                </div>
+            `;
+            showModalWithContent('线雕线材详情', html);
+        }
+
+        function showThreadAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">产品名称 *</label><input class="form-input" id="thName" placeholder="如：美迪塑"></div>
+                <div class="form-group"><label class="form-label">厂家</label><input class="form-input" id="thManufacturer" placeholder=""></div>
+                <div class="form-group"><label class="form-label">成份</label><input class="form-input" id="thIngredient" placeholder="如：PDO/PPDO"></div>
+                <div class="form-group"><label class="form-label">线材形态</label><select class="form-select" id="thShape"><option>大V线</option><option>小V线</option><option>平滑线</option><option>螺旋线</option><option>铃铛线</option></select></div>
+                <div class="form-group"><label class="form-label">适应症</label><input class="form-input" id="thIndication" placeholder="如：面部提升"></div>
+                <div class="form-group"><label class="form-label">适用部位</label><input class="form-input" id="thPosition" placeholder=""></div>
+                <div class="form-group"><label class="form-label">维持时间（月）</label><input class="form-input" type="number" id="thDuration" placeholder="如：12"></div>
+                <div class="form-group"><label class="form-label">参考价格（元）</label><input class="form-input" type="number" id="thPrice" placeholder=""></div>
+                <div class="form-group"><label class="form-label">备注</label><input class="form-input" id="thNotes" placeholder=""></div>
+                <button class="btn btn-primary btn-block" onclick="saveThread()">保存</button>
+            `;
+            showModalWithContent('新增线材', html);
+        }
+
+        async function saveThread() {
+            const name = document.getElementById('thName').value.trim();
+            if (!name) { showToast('请输入产品名称'); return; }
+            const data = {
+                name,
+                manufacturer: document.getElementById('thManufacturer').value.trim(),
+                ingredient: document.getElementById('thIngredient').value.trim(),
+                shape: document.getElementById('thShape').value,
+                indication: document.getElementById('thIndication').value.trim(),
+                position: document.getElementById('thPosition').value.trim(),
+                duration: document.getElementById('thDuration').value.trim(),
+                price: parseFloat(document.getElementById('thPrice').value) || 0,
+                notes: document.getElementById('thNotes').value.trim(),
+                createdAt: Date.now()
+            };
+            await dbAdd('threads', data);
+            closeModal();
+            renderThreadList();
+            showToast('已添加');
+        }
+
+        async function deleteThread(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('threads', id);
+            closeModal();
+            renderThreadList();
+            showToast('已删除');
+        }
+
+        // ========== Scar Types (unchanged) ==========
+        async function renderScarTypeList() {
+            const container = document.getElementById('scarTypeListContainer');
+            const types = await dbGetAll('scarTypes');
+            if (types.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔬</div><p>暂无瘢痕类型数据</p></div>';
+                return;
+            }
+            container.innerHTML = types.map(t => `
+                <div class="card" onclick="viewScarType(${t.id})" style="cursor:pointer;">
+                    <div class="card-title">${t.name || '未命名'} <span class="badge badge-gray text-sm">3档方案</span></div>
+                    <div class="text-sm text-muted">${t.description || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        async function viewScarType(id) {
+            const t = await dbGet('scarTypes', id);
+            if (!t) return;
+            const levels = [
+                { key: 'level1', label: '轻度/基础治疗', color: 'green' },
+                { key: 'level2', label: '中度/强化治疗', color: 'orange' },
+                { key: 'level3', label: '重度/联合治疗', color: 'red' }
+            ];
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${t.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deleteScarType(${t.id})">删除</button>
+                    </div>
+                    ${t.description ? `<div class="text-sm mb-12">${t.description}</div>` : ''}
+                </div>
+                ${levels.map(l => `
+                    <div class="card" style="border-left:3px solid var(--${l.color});">
+                        <span class="badge badge-${l.color} mb-8">${l.label}</span>
+                        <div class="text-sm"><strong>治疗手段:</strong> ${t[l.key]?.method || '未设置'}</div>
+                        <div class="text-sm mt-4"><strong>具体说明:</strong> ${t[l.key]?.detail || '未设置'}</div>
+                    </div>
+                `).join('')}
+            `;
+            showModalWithContent('瘢痕类型', html);
+        }
+
+        function showScarTypeAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">瘢痕类型 *</label><input class="form-input" id="stName" placeholder="如：增生性瘢痕"></div>
+                <div class="form-group"><label class="form-label">类型说明</label><textarea class="form-textarea" id="stDesc" placeholder=""></textarea></div>
+                <div class="form-group"><label class="form-label">轻度·治疗手段</label><input class="form-input" id="st1Method" placeholder="如：外用硅酮凝胶"></div>
+                <div class="form-group"><label class="form-label">轻度·具体说明</label><input class="form-input" id="st1Detail" placeholder=""></div>
+                <div class="form-group"><label class="form-label">中度·治疗手段</label><input class="form-input" id="st2Method" placeholder="如：激光+注射"></div>
+                <div class="form-group"><label class="form-label">中度·具体说明</label><input class="form-input" id="st2Detail" placeholder=""></div>
+                <div class="form-group"><label class="form-label">重度·治疗手段</label><input class="form-input" id="st3Method" placeholder="如：手术+放疗"></div>
+                <div class="form-group"><label class="form-label">重度·具体说明</label><input class="form-input" id="st3Detail" placeholder=""></div>
+                <button class="btn btn-primary btn-block" onclick="saveScarType()">保存</button>
+            `;
+            showModalWithContent('新增瘢痕类型', html);
+        }
+
+        async function saveScarType() {
+            const name = document.getElementById('stName').value.trim();
+            if (!name) { showToast('请输入类型名称'); return; }
+            const data = {
+                name,
+                description: document.getElementById('stDesc').value.trim(),
+                level1: { method: document.getElementById('st1Method').value.trim(), detail: document.getElementById(
+                        'st1Detail').value.trim() },
+                level2: { method: document.getElementById('st2Method').value.trim(), detail: document.getElementById(
+                        'st2Detail').value.trim() },
+                level3: { method: document.getElementById('st3Method').value.trim(), detail: document.getElementById(
+                        'st3Detail').value.trim() },
+                createdAt: Date.now()
+            };
+            await dbAdd('scarTypes', data);
+            closeModal();
+            renderScarTypeList();
+            showToast('已添加');
+        }
+
+        async function deleteScarType(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('scarTypes', id);
+            closeModal();
+            renderScarTypeList();
+            showToast('已删除');
+        }
+
+        // ========== Scar Medicines (unchanged) ==========
+        function setScarMedDim(dim) {
+            scarMedDim = dim;
+            document.querySelectorAll('#scarMedDimSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.dim === dim);
+            });
+            renderScarMedList();
+        }
+
+        function setScarMedForm(form) {
+            scarMedForm = form;
+            document.querySelectorAll('#scarMedFormSeg .seg-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.form === form);
+            });
+            renderScarMedList();
+        }
+
+        async function renderScarMedList() {
+            const container = document.getElementById('scarMedListContainer');
+            let meds = await dbGetAll('scarMeds');
+            if (scarMedForm !== '全部') {
+                meds = meds.filter(m => (m.form || '').includes(scarMedForm));
+            }
+            const searchTerm = (document.getElementById('scarMedSearchInput').value || '').toLowerCase();
+            if (searchTerm) {
+                meds = meds.filter(m => (m.name || '').toLowerCase().includes(searchTerm));
+            }
+            if (meds.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">💊</div><p>暂无瘢痕用药数据</p></div>';
+                return;
+            }
+            const formColors = { '外用': 'blue', '注射': 'red', '口服': 'green' };
+            container.innerHTML = meds.map(m => `
+                <div class="list-item" onclick="viewScarMed(${m.id})">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${m.name || '未命名'}</div>
+                        <div class="list-item-subtitle">${m.manufacturer || ''} · ${m.indication || ''} · ${m.ingredient || ''}</div>
+                    </div>
+                    <span class="badge badge-${formColors[m.form] || 'gray'}">${m.form || '未分类'}</span>
+                    <span class="text-sm" style="font-weight:600;color:var(--primary);">¥${m.price || '--'}</span>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        async function viewScarMed(id) {
+            const m = await dbGet('scarMeds', id);
+            if (!m) return;
+            const html = `
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 style="font-size:17px;font-weight:700;">${m.name || '未命名'}</h2>
+                        <button class="btn btn-danger btn-sm" onclick="deleteScarMed(${m.id})">删除</button>
+                    </div>
+                    <div class="tag-group mb-12">
+                        ${m.form ? `<span class="badge badge-primary">${m.form}</span>` : ''}
+                        ${m.manufacturer ? `<span class="badge badge-blue">厂家: ${m.manufacturer}</span>` : ''}
+                        ${m.ingredient ? `<span class="badge badge-green">成份: ${m.ingredient}</span>` : ''}
+                        ${m.indication ? `<span class="badge badge-orange">适应症: ${m.indication}</span>` : ''}
+                    </div>
+                    ${m.usage ? `<div class="text-sm mb-8"><strong>用法用量:</strong> ${m.usage}</div>` : ''}
+                    ${m.caution ? `<div class="text-sm mb-8"><strong>注意事项:</strong> ${m.caution}</div>` : ''}
+                    <div class="text-sm"><strong>参考价格:</strong> <span style="font-weight:600;color:var(--primary);">¥${m.price || '--'}</span></div>
+                </div>
+            `;
+            showModalWithContent('瘢痕用药详情', html);
+        }
+
+        function showScarMedAddModal() {
+            const html = `
+                <div class="form-group"><label class="form-label">药品名称 *</label><input class="form-input" id="smName" placeholder="如：芭克"></div>
+                <div class="form-group"><label class="form-label">剂型</label><select class="form-select" id="smForm"><option>外用</option><option>注射</option><option>口服</option></select></div>
+                <div class="form-group"><label class="form-label">成份</label><input class="form-input" id="smIngredient" placeholder=""></div>
+                <div class="form-group"><label class="form-label">厂家</label><input class="form-input" id="smManufacturer" placeholder=""></div>
+                <div class="form-group"><label class="form-label">适应症</label><input class="form-input" id="smIndication" placeholder=""></div>
+                <div class="form-group"><label class="form-label">用法用量</label><input class="form-input" id="smUsage" placeholder=""></div>
+                <div class="form-group"><label class="form-label">注意事项</label><input class="form-input" id="smCaution" placeholder=""></div>
+                <div class="form-group"><label class="form-label">参考价格（元）</label><input class="form-input" type="number" id="smPrice" placeholder=""></div>
+                <button class="btn btn-primary btn-block" onclick="saveScarMed()">保存</button>
+            `;
+            showModalWithContent('新增瘢痕用药', html);
+        }
+
+        async function saveScarMed() {
+            const name = document.getElementById('smName').value.trim();
+            if (!name) { showToast('请输入药品名称'); return; }
+            const data = {
+                name,
+                form: document.getElementById('smForm').value,
+                ingredient: document.getElementById('smIngredient').value.trim(),
+                manufacturer: document.getElementById('smManufacturer').value.trim(),
+                indication: document.getElementById('smIndication').value.trim(),
+                usage: document.getElementById('smUsage').value.trim(),
+                caution: document.getElementById('smCaution').value.trim(),
+                price: parseFloat(document.getElementById('smPrice').value) || 0,
+                createdAt: Date.now()
+            };
+            await dbAdd('scarMeds', data);
+            closeModal();
+            renderScarMedList();
+            showToast('已添加');
+        }
+
+        async function deleteScarMed(id) {
+            if (!confirm('确认删除？')) return;
+            await dbDelete('scarMeds', id);
+            closeModal();
+            renderScarMedList();
+            showToast('已删除');
+        }
+
+        // ========== Stats Overview ==========
+        async function renderStatsOverview() {
+            const container = document.getElementById('statsOverviewContainer');
+            if (!container) return;
+            const storeNames = {
+                'diseaseRecords': '皮肤疾病记录',
+                'westernMeds': '西药',
+                'compatPlans': '配伍方案',
+                'herbalMeds': '中药',
+                'patentMeds': '中成药',
+                'hydraProducts': '水光针',
+                'fillers': '填充剂',
+                'threads': '线材',
+                'scarTypes': '瘢痕类型',
+                'scarMeds': '瘢痕用药',
+                'cosmeticProjects': '医美项目'
+            };
+            let html = '';
+            for (const [store, label] of Object.entries(storeNames)) {
+                const items = await dbGetAll(store);
+                html += `<div class="flex justify-between items-center" style="padding:6px 0;border-bottom:1px solid #F0F4F8;">
+                    <span class="text-sm">${label}</span>
+                    <span class="badge badge-primary">${items.length}</span>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // ========== Global Search ==========
+        function openGlobalSearch() {
+            document.getElementById('globalSearchOverlay').classList.add('show');
+            document.getElementById('globalSearchInput').value = '';
+            document.getElementById('globalSearchResults').innerHTML = '';
+            setTimeout(() => document.getElementById('globalSearchInput').focus(), 100);
+        }
+
+        function closeGlobalSearch() {
+            document.getElementById('globalSearchOverlay').classList.remove('show');
+        }
+
+        async function performGlobalSearch() {
+            const term = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+            const results = document.getElementById('globalSearchResults');
+            if (!term) { results.innerHTML = ''; return; }
+            const allResults = [];
+            const searches = [
+                { store: 'diseaseRecords', fields: ['name', 'symptoms', 'gradient'], label: '皮肤疾病记录', icon: '🩺' },
+                { store: 'westernMeds', fields: ['genericName', 'ingredient', 'indication'], label: '西药', icon: '💊' },
+                { store: 'compatPlans', fields: ['diseaseName'], label: '配伍方案', icon: '📋' },
+                { store: 'herbalMeds', fields: ['name', 'efficacy'], label: '中药', icon: '🌿' },
+                { store: 'patentMeds', fields: ['name', 'indication'], label: '中成药', icon: '💊' },
+                { store: 'hydraProducts', fields: ['name', 'ingredient'], label: '水光针', icon: '💉' },
+                { store: 'fillers', fields: ['name', 'ingredient'], label: '填充剂', icon: '💉' },
+                { store: 'threads', fields: ['name', 'ingredient'], label: '线材', icon: '🧵' },
+                { store: 'scarTypes', fields: ['name'], label: '瘢痕类型', icon: '🔬' },
+                { store: 'scarMeds', fields: ['name', 'ingredient'], label: '瘢痕用药', icon: '💊' },
+                { store: 'cosmeticProjects', fields: ['name', 'plan', 'product', 'projectType'], label: '医美项目', icon: '✨' }
+            ];
+            for (const s of searches) {
+                const items = await dbGetAll(s.store);
+                items.forEach(item => {
+                    const match = s.fields.some(f => (item[f] || '').toLowerCase().includes(term));
+                    if (match) {
+                        allResults.push({
+                            label: s.label,
+                            icon: s.icon,
+                            name: item.name || item.genericName || item.diseaseName || '未命名',
+                            store: s.store,
+                            id: item.id,
+                            subtitle: item.symptoms || item.indication || item.projectType || ''
+                        });
+                    }
+                });
+            }
+            if (allResults.length === 0) {
+                results.innerHTML = '<div class="text-center text-muted text-sm" style="padding:20px;">无搜索结果</div>';
+                return;
+            }
+            results.innerHTML = allResults.map(r => `
+                <div class="list-item" onclick="searchResultClick('${r.store}',${r.id})">
+                    <span style="font-size:20px;">${r.icon}</span>
+                    <div class="list-item-content">
+                        <div class="list-item-title">${r.name}</div>
+                        <div class="list-item-subtitle">${r.label} · ${r.subtitle}</div>
+                    </div>
+                    <span class="list-item-arrow">›</span>
+                </div>
+            `).join('');
+        }
+
+        function searchResultClick(store, id) {
+            closeGlobalSearch();
+            if (store === 'diseaseRecords') {
+                switchTab(1);
+                viewDiseaseRecord(id);
+            } else if (store === 'cosmeticProjects') {
+                switchTab(1);
+                viewCosmeticProject(id);
+            } else if (store === 'compatPlans') {
+                switchTab(2);
+                navigateToPage('page-compat');
+                viewCompatPlan(id);
+            } else if (store === 'westernMeds') {
+                switchTab(2);
+                navigateToPage('page-western-med');
+                viewWesternMed(id);
+            } else if (store === 'herbalMeds') {
+                switchTab(2);
+                navigateToPage('page-herbal');
+                viewHerbal(id);
+            } else if (store === 'patentMeds') {
+                switchTab(2);
+                navigateToPage('page-patent-med');
+                viewPatentMed(id);
+            } else if (store === 'hydraProducts') {
+                switchTab(3);
+                navigateToPage('page-hydra');
+                viewHydraProduct(id);
+            } else if (store === 'fillers') {
+                switchTab(3);
+                navigateToPage('page-fillers');
+                viewFiller(id);
+            } else if (store === 'threads') {
+                switchTab(3);
+                navigateToPage('page-threads');
+                viewThread(id);
+            } else if (store === 'scarTypes') {
+                switchTab(2);
+                navigateToPage('page-scar-types');
+                viewScarType(id);
+            } else if (store === 'scarMeds') {
+                switchTab(2);
+                navigateToPage('page-scar-meds');
+                viewScarMed(id);
+            }
+        }
+
+        // ========== Modal ==========
+        function showModalWithContent(title, contentHtml) {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay show';
+            overlay.innerHTML = `
+                <div class="modal-sheet">
+                    <div class="modal-header">
+                        <div class="modal-title">${title}</div>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                    </div>
+                    ${contentHtml}
+                </div>
+            `;
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.remove();
+            });
+            document.body.appendChild(overlay);
+        }
+
+        function closeModal() {
+            const overlays = document.querySelectorAll('.modal-overlay.show');
+            overlays.forEach(o => o.remove());
+        }
+
+        // ========== Photo Preview ==========
+        function showPhotoPreview(src) {
+            const overlay = document.getElementById('photoPreviewOverlay');
+            const img = document.getElementById('photoPreviewImg');
+            img.src = src;
+            overlay.classList.add('show');
+        }
+
+        function closePhotoPreview() {
+            document.getElementById('photoPreviewOverlay').classList.remove('show');
+        }
+
+        // ========== Image Compression ==========
+        function compressImage(file, maxWidth) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => {
+                            const reader2 = new FileReader();
+                            reader2.onload = () => resolve(reader2.result);
+                            reader2.onerror = reject;
+                            reader2.readAsDataURL(blob);
+                        }, 'image/jpeg', 0.7);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ========== Backup/Export ==========
+        async function exportBackup() {
+            try {
+                const allData = {};
+                for (const store of STORES) {
+                    allData[store] = await dbGetAll(store);
+                }
+                const backup = {
+                    version: '1.0',
+                    exportedAt: Date.now(),
+                    data: allData
+                };
+                const jsonStr = JSON.stringify(backup);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `皮肤科助手备份_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                showToast('备份已导出');
+            } catch (e) {
+                showToast('导出失败: ' + e.message);
+            }
+        }
+
+        function showImportModal() {
+            const html = `
+                <div class="text-sm mb-12" style="color:var(--red);">⚠️ 导入将覆盖当前所有数据，请确认已备份！</div>
+                <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importBackup(event)">
+                <button class="btn btn-primary btn-block" onclick="document.getElementById('importFileInput').click()">选择备份文件</button>
+            `;
+            showModalWithContent('从备份恢复', html);
+        }
+
+        async function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                const backup = JSON.parse(text);
+                if (!backup.data) { showToast('无效的备份文件'); return; }
+                if (!confirm('确认导入？当前数据将被覆盖！')) return;
+                for (const store of STORES) {
+                    await dbClear(store);
+                    const items = backup.data[store] || [];
+                    for (const item of items) {
+                        await dbAdd(store, item);
+                    }
+                }
+                closeModal();
+                showToast('数据已恢复');
+                renderCurrentPage();
+            } catch (e) {
+                showToast('导入失败: ' + e.message);
+            }
+        }
+
+        function showAboutModal() {
+            const html = `
+                <div class="text-center mb-12">
+                    <div style="font-size:48px;margin-bottom:8px;">🏥</div>
+                    <h3 style="font-size:16px;font-weight:700;">皮肤科医美工作助手</h3>
+                    <div class="text-sm text-muted">版本 v1.0</div>
+                </div>
+                <div class="text-sm text-muted mb-8">为皮肤科门诊结合医美方向的从业者提供的个人工作助手。</div>
+                <div class="text-sm text-muted mb-8">所有数据仅保存在本机，不联网、不登录、不传输。</div>
+                <div class="text-sm text-muted">诊疗记录分为「皮肤疾病记录」和「医疗美容项目」，后者支持注射填充、水光针、滚针、光电、瘢痕、植发等各类项目及前后对比照。</div>
+            `;
+            showModalWithContent('关于 App', html);
+        }
+
+        function showClearDataModal() {
+            const html = `
+                <div class="text-sm mb-12" style="color:var(--red);font-weight:600;">⚠️ 此操作将永久删除所有数据，不可恢复！</div>
+                <div class="text-sm text-muted mb-12">建议先导出备份文件到「文件」App 中。</div>
+                <button class="btn btn-danger btn-block" onclick="confirmClearAllData()">确认清空所有数据</button>
+                <button class="btn btn-outline btn-block mt-8" onclick="closeModal()">取消</button>
+            `;
+            showModalWithContent('清空数据', html);
+        }
+
+        async function confirmClearAllData() {
+            if (!confirm('再次确认：所有数据将被永久删除！')) return;
+            for (const store of STORES) {
+                await dbClear(store);
+            }
+            closeModal();
+            showToast('数据已清空');
+            await seedPresetData();
+            renderCurrentPage();
+        }
+
+        // ========== Toast ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // ========== Utilities ==========
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const d = new Date(timestamp);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return '';
+            const d = new Date(timestamp);
+            return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
+
+        // ========== Preset Data ==========
+        async function seedPresetData() {
+            const existing = await dbGetAll('diseaseRecords');
+            if (existing.length > 0) return;
+
+            const presetDiseases = [
+                { name: '湿疹', pathology: '皮肤屏障功能受损，免疫失调', symptoms: '红斑、丘疹、瘙痒、渗出', gradient: '轻: 保湿霜+弱效激素；中: 中效激素+抗组胺；重: 强效激素+免疫抑制剂',
+                    complications: '继发感染——使用抗生素', currentScore: 7, photos: [], createdAt: Date.now() - 86400000,
+                    updatedAt: Date.now() - 86400000, scoreHistory: [{ score: 6, timestamp: Date.now() - 43200000 },
+                    { score: 7, timestamp: Date.now() }] },
+                { name: '痤疮', pathology: '毛囊皮脂腺炎症', symptoms: '粉刺、丘疹、脓疱', gradient: '轻: 外用维A酸；中: 口服抗生素+外用；重: 异维A酸',
+                    complications: '痘印——激光治疗', currentScore: 8, photos: [], createdAt: Date.now() - 172800000,
+                    updatedAt: Date.now() - 172800000, scoreHistory: [{ score: 8, timestamp: Date.now() - 172800000 }] },
+            ];
+            for (const d of presetDiseases) {
+                await dbAdd('diseaseRecords', d);
+            }
+
+            const presetWestern = [
+                { genericName: '他克莫司软膏', ingredient: '他克莫司', manufacturer: '日本安斯泰来', indication: '特应性皮炎',
+                    usage: '每日2次外用', notes: '', createdAt: Date.now() },
+                { genericName: '氢化可的松软膏', ingredient: '氢化可的松', manufacturer: '国产', indication: '湿疹',
+                    usage: '每日2次外用', notes: '弱效激素', createdAt: Date.now() },
+                { genericName: '莫匹罗星软膏', ingredient: '莫匹罗星', manufacturer: '国产', indication: '皮肤感染',
+                    usage: '每日3次外用', notes: '', createdAt: Date.now() },
+                { genericName: '氯雷他定', ingredient: '氯雷他定', manufacturer: '国产', indication: '荨麻疹',
+                    usage: '每日1次口服', notes: '', createdAt: Date.now() },
+                { genericName: '异维A酸胶囊', ingredient: '异维A酸', manufacturer: '国产', indication: '重度痤疮',
+                    usage: '每日1次口服', notes: '需监测肝功能', createdAt: Date.now() },
+            ];
+            for (const m of presetWestern) {
+                await dbAdd('westernMeds', m);
+            }
+
+            const presetCompat = [
+                { diseaseName: '湿疹', level1: { drugs: '保湿霜+氢化可的松软膏', usage: '每日2次外用', note: '轻中度首选' },
+                    level2: { drugs: '他克莫司软膏+抗组胺', usage: '每日2次外用+口服', note: '中重度强化' },
+                    level3: { drugs: '强效激素+免疫抑制剂+光疗', usage: '联合治疗', note: '难治性联合' },
+                    createdAt: Date.now() },
+                { diseaseName: '痤疮', level1: { drugs: '外用维A酸+过氧苯甲酰', usage: '每日1次外用', note: '轻中度首选' },
+                    level2: { drugs: '口服多西环素+外用维A酸', usage: '每日口服+外用', note: '中重度强化' },
+                    level3: { drugs: '异维A酸+红蓝光', usage: '每日口服+每周光照', note: '难治性联合' },
+                    createdAt: Date.now() },
+            ];
+            for (const p of presetCompat) {
+                await dbAdd('compatPlans', p);
+            }
+
+            const presetHerbal = [
+                { name: '黄柏', category: '清热燥湿', nature: '苦、寒，归肾经', efficacy: '清热燥湿，泻火解毒', indication: '湿疹、疮疡',
+                    usage: '3-12g煎服', caution: '脾胃虚寒者慎用', favorite: false, createdAt: Date.now() },
+                { name: '苦参', category: '清热燥湿', nature: '苦、寒，归心经', efficacy: '清热燥湿，杀虫止痒', indication: '皮肤瘙痒',
+                    usage: '3-10g煎服', caution: '不宜久服', favorite: false, createdAt: Date.now() },
+                { name: '当归', category: '养血润燥', nature: '甘、辛、温，归肝心经', efficacy: '补血活血，润燥', indication: '血虚风燥',
+                    usage: '6-12g煎服', caution: '', favorite: false, createdAt: Date.now() },
+            ];
+            for (const h of presetHerbal) {
+                await dbAdd('herbalMeds', h);
+            }
+
+            const presetPatent = [
+                { name: '消风散', category: '湿疹', composition: '荆芥、防风、牛蒡子、蝉蜕', efficacy: '疏风清热，除湿止痒',
+                    indication: '湿疹、荨麻疹', usage: '每日2次', caution: '', createdAt: Date.now() },
+                { name: '龙胆泻肝丸', category: '肝胆湿热', composition: '龙胆草、栀子、黄芩', efficacy: '清肝胆湿热',
+                    indication: '带状疱疹', usage: '每日2次', caution: '脾胃虚寒者慎用', createdAt: Date.now() },
+            ];
+            for (const p of presetPatent) {
+                await dbAdd('patentMeds', p);
+            }
+
+            const presetHydra = [
+                { name: '菲洛嘉青春动能素', manufacturer: '法国菲洛嘉', ingredient: '透明质酸+53种活性成分', indication: '抗衰、补水',
+                    compatPlan: '基础水光+动能素', createdAt: Date.now() },
+                { name: '丝丽532', manufacturer: '法国丝丽', ingredient: '透明质酸+多种维生素', indication: '补水、提亮',
+                    compatPlan: '基础水光+丝丽', createdAt: Date.now() },
+                { name: '嗨体2.5', manufacturer: '中国爱美客', ingredient: '透明质酸+氨基酸', indication: '颈纹填充',
+                    compatPlan: '嗨体+基础水光', createdAt: Date.now() },
+            ];
+            for (const p of presetHydra) {
+                await dbAdd('hydraProducts', p);
+            }
+
+            const presetFillers = [
+                { name: '乔雅登极致', manufacturer: '艾尔建', ingredient: '交联透明质酸', indication: '面部填充',
+                    position: '面颊、下巴', duration: '18', price: 4500, notes: '交联度高', createdAt: Date.now() },
+                { name: '瑞蓝2号', manufacturer: 'Galderma', ingredient: '交联透明质酸', indication: '唇部填充',
+                    position: '唇部', duration: '9', price: 2800, notes: '', createdAt: Date.now() },
+                { name: '双美胶原蛋白', manufacturer: '台湾双美', ingredient: '胶原蛋白', indication: '泪沟填充',
+                    position: '泪沟', duration: '12', price: 3800, notes: '', createdAt: Date.now() },
+            ];
+            for (const f of presetFillers) {
+                await dbAdd('fillers', f);
+            }
+
+            const presetThreads = [
+                { name: '美迪塑', manufacturer: '韩国', ingredient: 'PDO', shape: '大V线', indication: '面部提升',
+                    position: '面颊', duration: '12', price: 2800, notes: '', createdAt: Date.now() },
+                { name: '快翎', manufacturer: '国产', ingredient: 'PPDO', shape: '小V线', indication: '下颌缘提升',
+                    position: '下颌', duration: '10', price: 1800, notes: '', createdAt: Date.now() },
+            ];
+            for (const t of presetThreads) {
+                await dbAdd('threads', t);
+            }
+
+            const presetScarTypes = [
+                { name: '增生性瘢痕', description: '瘢痕组织过度增生，局限于原伤口范围', level1: { method: '外用硅酮凝胶',
+                        detail: '每日2次，持续3-6月' }, level2: { method: '皮损内注射曲安奈德', detail: '每3-4周一次' },
+                    level3: { method: '手术切除+放疗', detail: '联合治疗' }, createdAt: Date.now() },
+                { name: '瘢痕疙瘩', description: '瘢痕组织超出原伤口范围', level1: { method: '外用硅酮+压力治疗',
+                        detail: '持续6月' }, level2: { method: '曲安奈德+5-FU联合注射', detail: '每月一次' },
+                    level3: { method: '手术+放疗+药物', detail: '综合方案' }, createdAt: Date.now() },
+            ];
+            for (const s of presetScarTypes) {
+                await dbAdd('scarTypes', s);
+            }
+
+            const presetScarMeds = [
+                { name: '芭克硅凝胶', form: '外用', ingredient: '硅酮', manufacturer: '美国', indication: '增生性瘢痕',
+                    usage: '每日2次', caution: '', price: 380, createdAt: Date.now() },
+                { name: '曲安奈德注射液', form: '注射', ingredient: '曲安奈德', manufacturer: '国产', indication: '瘢痕疙瘩',
+                    usage: '皮损内注射', caution: '注意剂量', price: 60, createdAt: Date.now() },
+            ];
+            for (const m of presetScarMeds) {
+                await dbAdd('scarMeds', m);
+            }
+
+            // 预置一个医美项目示例
+            const presetCosmetic = [
+                { projectType: '注射填充', name: '乔雅登鼻唇沟填充', date: new Date().toISOString().split('T')[0],
+                    plan: '局部麻醉后，使用乔雅登极致0.5ml，多层次注射', product: '乔雅登极致', notes: '效果满意',
+                    photoBefore: null, photoAfter: null, createdAt: Date.now(), updatedAt: Date.now() }
+            ];
+            for (const c of presetCosmetic) {
+                await dbAdd('cosmeticProjects', c);
+            }
+
+            showToast('预置数据已加载');
+        }
+
+        // ========== Event Listeners ==========
+        document.getElementById('globalSearchBtn').addEventListener('click', openGlobalSearch);
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                openGlobalSearch();
+            }
+        });
+
+        // ========== Init ==========
+        async function initApp() {
+            try {
+                await initDB();
+                await seedPresetData();
+                renderHome();
+                const now = new Date();
+                const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]}`;
+                document.getElementById('headerDate').textContent = dateStr;
+                document.getElementById('cosmeticFormDate').value = now.toISOString().split('T')[0];
+            } catch (e) {
+                console.error('Init error:', e);
+                showToast('初始化失败: ' + e.message);
+            }
+        }
+
+        document.querySelectorAll('.tab-item').forEach(item => {
+            item.addEventListener('click', () => {
+                switchTab(parseInt(item.dataset.tab));
+            });
+        });
+
+        initApp();
+    </script>
+</body>
+</html>
